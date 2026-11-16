@@ -1,36 +1,40 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 330" width="820" height="330" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" role="img">
-<text x="70.0" y="30.0" font-size="18" fill="#f0f6fc" text-anchor="start" font-weight="600">Small tasks: the skill saves nothing</text>
-<text x="70.0" y="52.0" font-size="13" fill="#9198a1" text-anchor="start" font-weight="400">Work that fits one session, median total cost per run. Lowering the head to Opus medium</text>
-<text x="70.0" y="70.0" font-size="13" fill="#9198a1" text-anchor="start" font-weight="400">saved more than the skill did, so the skill now only says: do it alone.</text>
-<line x1="70.0" y1="274.0" x2="800.0" y2="274.0" stroke="#3d444d" stroke-width="1"/>
-<text x="60.0" y="278.0" font-size="12" fill="#9198a1" text-anchor="end" font-weight="400">$0.00</text>
-<line x1="70.0" y1="222.2" x2="800.0" y2="222.2" stroke="#3d444d" stroke-width="1"/>
-<text x="60.0" y="226.2" font-size="12" fill="#9198a1" text-anchor="end" font-weight="400">$0.50</text>
-<line x1="70.0" y1="170.5" x2="800.0" y2="170.5" stroke="#3d444d" stroke-width="1"/>
-<text x="60.0" y="174.5" font-size="12" fill="#9198a1" text-anchor="end" font-weight="400">$1.00</text>
-<line x1="70.0" y1="118.7" x2="800.0" y2="118.7" stroke="#3d444d" stroke-width="1"/>
-<text x="60.0" y="122.7" font-size="12" fill="#9198a1" text-anchor="end" font-weight="400">$1.50</text>
-<rect x="150.3" y="204.8" width="52.1" height="69.2" rx="3" fill="#768390" fill-opacity="0.90"/>
-<text x="176.3" y="198.8" font-size="12" fill="#768390" text-anchor="middle" font-weight="600">$0.67</text>
-<rect x="208.3" y="131.6" width="52.1" height="142.4" rx="3" fill="#ab7df8" fill-opacity="0.90"/>
-<text x="234.4" y="125.6" font-size="12" fill="#ab7df8" text-anchor="middle" font-weight="600">$1.38</text>
-<text x="208.3" y="296.0" font-size="12" fill="#f0f6fc" text-anchor="middle" font-weight="600">round 1 · skill 2.1</text>
-<rect x="386.9" y="197.8" width="52.1" height="76.2" rx="3" fill="#768390" fill-opacity="0.90"/>
-<text x="413.0" y="191.8" font-size="12" fill="#768390" text-anchor="middle" font-weight="600">$0.74</text>
-<rect x="445.0" y="193.4" width="52.1" height="80.6" rx="3" fill="#ab7df8" fill-opacity="0.90"/>
-<text x="471.0" y="187.4" font-size="12" fill="#ab7df8" text-anchor="middle" font-weight="600">$0.78</text>
-<text x="445.0" y="296.0" font-size="12" fill="#f0f6fc" text-anchor="middle" font-weight="600">round 2 · skill 2.2</text>
-<rect x="594.6" y="194.4" width="52.1" height="79.6" rx="3" fill="#768390" fill-opacity="0.90"/>
-<text x="620.6" y="188.4" font-size="12" fill="#768390" text-anchor="middle" font-weight="600">$0.77</text>
-<rect x="652.6" y="221.9" width="52.1" height="52.1" rx="3" fill="#ab7df8" fill-opacity="0.90"/>
-<text x="678.7" y="215.9" font-size="12" fill="#ab7df8" text-anchor="middle" font-weight="600">$0.50</text>
-<rect x="710.7" y="235.9" width="52.1" height="38.1" rx="3" fill="#3fb950" fill-opacity="0.90"/>
-<text x="736.7" y="229.9" font-size="12" fill="#3fb950" text-anchor="middle" font-weight="600">$0.37</text>
-<text x="681.7" y="296.0" font-size="12" fill="#f0f6fc" text-anchor="middle" font-weight="600">round 3 · skill 2.3 at a medium head</text>
-<rect x="70.0" y="308.0" width="12.0" height="12.0" rx="3" fill="#768390" fill-opacity="0.90"/>
-<text x="88.0" y="319.0" font-size="11" fill="#9198a1" text-anchor="start" font-weight="400">no skill, Opus high</text>
-<rect x="227.8" y="308.0" width="12.0" height="12.0" rx="3" fill="#ab7df8" fill-opacity="0.90"/>
-<text x="245.8" y="319.0" font-size="11" fill="#9198a1" text-anchor="start" font-weight="400">work-triage</text>
-<rect x="336.0" y="308.0" width="12.0" height="12.0" rx="3" fill="#3fb950" fill-opacity="0.90"/>
-<text x="354.0" y="319.0" font-size="11" fill="#9198a1" text-anchor="start" font-weight="400">no skill, Opus medium</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 400" width="880" height="400" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" role="img">
+<text x="28.0" y="38.0" font-size="20" fill="#f0f6fc" text-anchor="start" font-weight="650">Small tasks: the skill saves nothing</text>
+<text x="28.0" y="62.0" font-size="13.5" fill="#9198a1" text-anchor="start" font-weight="400">Work that fits one session, median total cost per run. Lowering the head to Opus medium saved more.</text>
+<rect x="28.0" y="84.0" width="824.0" height="280.0" rx="10" fill="#151b23" fill-opacity="1.00" stroke="#30363d" stroke-width="1"/>
+<rect x="52.0" y="102.0" width="12.0" height="12.0" rx="3" fill="#768390" fill-opacity="1.00"/>
+<text x="70.0" y="112.0" font-size="12" fill="#9198a1" text-anchor="start" font-weight="400">no skill, Opus high</text>
+<rect x="211.4" y="102.0" width="12.0" height="12.0" rx="3" fill="#ab7df8" fill-opacity="1.00"/>
+<text x="229.4" y="112.0" font-size="12" fill="#9198a1" text-anchor="start" font-weight="400">work-triage</text>
+<rect x="318.0" y="102.0" width="12.0" height="12.0" rx="3" fill="#3fb950" fill-opacity="1.00"/>
+<text x="336.0" y="112.0" font-size="12" fill="#9198a1" text-anchor="start" font-weight="400">no skill, Opus medium</text>
+<line x1="84.0" y1="308.0" x2="834.0" y2="308.0" stroke="#30363d" stroke-width="1.0" stroke-linecap="butt"/>
+<text x="74.0" y="312.0" font-size="11.5" fill="#6e7681" text-anchor="end" font-weight="400">$0.00</text>
+<line x1="84.0" y1="253.8" x2="834.0" y2="253.8" stroke="#30363d" stroke-width="1.0" stroke-linecap="butt"/>
+<text x="74.0" y="257.8" font-size="11.5" fill="#6e7681" text-anchor="end" font-weight="400">$0.50</text>
+<line x1="84.0" y1="199.5" x2="834.0" y2="199.5" stroke="#30363d" stroke-width="1.0" stroke-linecap="butt"/>
+<text x="74.0" y="203.5" font-size="11.5" fill="#6e7681" text-anchor="end" font-weight="400">$1.00</text>
+<line x1="84.0" y1="145.3" x2="834.0" y2="145.3" stroke="#30363d" stroke-width="1.0" stroke-linecap="butt"/>
+<text x="74.0" y="149.3" font-size="11.5" fill="#6e7681" text-anchor="end" font-weight="400">$1.50</text>
+<rect x="152.7" y="235.5" width="54.0" height="72.5" rx="5" fill="#768390" fill-opacity="1.00"/>
+<text x="179.7" y="228.5" font-size="12.5" fill="#768390" text-anchor="middle" font-weight="650">$0.67</text>
+<rect x="214.7" y="158.8" width="54.0" height="149.2" rx="5" fill="#ab7df8" fill-opacity="1.00"/>
+<text x="241.7" y="151.8" font-size="12.5" fill="#ab7df8" text-anchor="middle" font-weight="650">$1.38</text>
+<text x="214.7" y="332.0" font-size="13" fill="#f0f6fc" text-anchor="middle" font-weight="600">Round 1</text>
+<text x="214.7" y="350.0" font-size="12" fill="#9198a1" text-anchor="middle" font-weight="400">skill 2.1</text>
+<rect x="398.0" y="228.1" width="54.0" height="79.9" rx="5" fill="#768390" fill-opacity="1.00"/>
+<text x="425.0" y="221.1" font-size="12.5" fill="#768390" text-anchor="middle" font-weight="650">$0.74</text>
+<rect x="460.0" y="223.6" width="54.0" height="84.4" rx="5" fill="#ab7df8" fill-opacity="1.00"/>
+<text x="487.0" y="216.6" font-size="12.5" fill="#ab7df8" text-anchor="middle" font-weight="650">$0.78</text>
+<text x="460.0" y="332.0" font-size="13" fill="#f0f6fc" text-anchor="middle" font-weight="600">Round 2</text>
+<text x="460.0" y="350.0" font-size="12" fill="#9198a1" text-anchor="middle" font-weight="400">skill 2.2</text>
+<rect x="612.3" y="224.7" width="54.0" height="83.3" rx="5" fill="#768390" fill-opacity="1.00"/>
+<text x="639.3" y="217.7" font-size="12.5" fill="#768390" text-anchor="middle" font-weight="650">$0.77</text>
+<rect x="674.3" y="253.4" width="54.0" height="54.6" rx="5" fill="#ab7df8" fill-opacity="1.00"/>
+<text x="701.3" y="246.4" font-size="12.5" fill="#ab7df8" text-anchor="middle" font-weight="650">$0.50</text>
+<rect x="736.3" y="268.1" width="54.0" height="39.9" rx="5" fill="#3fb950" fill-opacity="1.00"/>
+<text x="763.3" y="261.1" font-size="12.5" fill="#3fb950" text-anchor="middle" font-weight="650">$0.37</text>
+<text x="705.3" y="332.0" font-size="13" fill="#f0f6fc" text-anchor="middle" font-weight="600">Round 3</text>
+<text x="705.3" y="350.0" font-size="12" fill="#9198a1" text-anchor="middle" font-weight="400">skill 2.3, head at medium</text>
+<text x="28.0" y="386.0" font-size="11" fill="#6e7681" text-anchor="start" font-weight="400">Source: study/data/runs.csv, rounds 1 to 3, nine to twelve runs per bar.</text>
 </svg>

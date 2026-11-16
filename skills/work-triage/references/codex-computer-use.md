@@ -1,9 +1,10 @@
 # Codex computer use
 
-Rows come here when the triage sets a local app check to `Codex`: real UI interaction, screenshots,
-simulator, browser or device state, or a runtime check outside the parent's context, with no login.
-Model `gpt-6.1-terra` `medium`. There is no calibration data for terra yet, so the parent always looks at
-the captured evidence itself.
+Codex is optional: a local app check goes to Codex only when the user works with Codex or asks for it;
+otherwise the parent (the main session the user talks to) checks the app with its own tools. A Codex check
+covers real UI interaction, screenshots, simulator, browser or device state, or a runtime check outside the
+parent's context, with no login. Model `gpt-6.1-terra` `medium`. There is no calibration data for terra yet,
+so the parent always looks at the captured evidence itself.
 
 Never here:
 

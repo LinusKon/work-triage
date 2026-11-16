@@ -1,17 +1,17 @@
 # Codex review
 
-Rows come here when the triage places a cross-family review at a join and the work under review is
-Claude's: `gpt-6-astra` `high` reviews it (work done by Codex gets a Claude review instead). The
-cross-family review replaces the same-family review at that join; it is not added to it. Reviewer prompt,
-severity rules and how many fix rounds follow: `verify.md`.
+A Codex review or second opinion runs only when the user asks for one: `gpt-6-astra` `high` is the most
+expensive model. By default a build gets one review, by `wt-reviewer` at the join (`SKILL.md` section 2); a
+Codex review the user asked for comes in addition to it. Reviewer prompt, severity rules and fix rounds:
+`verify.md`.
 
-Never here: security and secrets rows. They get one review by Opus 5.5 `high` (`xhigh` only on escalation)
-and stay out of every Codex review's scope, the final one included: name the rows a Codex review
-covers and leave those out. Other floor rows (interface, migration prepare, irreversible prepare) are covered
-by the join or final review before their gate, and that review may be this one. A row whose check stands
-alone needs no review of its own; accepting it (reading output and check) is not a review.
+Never here: security and secrets rows. They get one `wt-reviewer` review (Opus 5.5 `high`, `xhigh` only on
+escalation) and stay out of every Codex review's scope: name the rows a Codex review covers and leave those
+out. A row whose check stands alone needs no review of its own; accepting it (reading output and check) is not a
+review.
 
-Codex's findings are evidence, not authority: the parent checks each one against the code before it counts.
+Codex's findings are evidence, not authority: the parent (the main session the user talks to) checks each one
+against the code before it counts.
 
 ## Run a review
 
@@ -61,4 +61,4 @@ Before relaying a finding, read the cited code or diff and decide whether it is 
 issues apart from Codex suggestions you did not verify. If Codex finds nothing, say so and name the review
 target it inspected.
 
-If `codex` is missing or the run fails, report the error and run the review on Claude at the same join.
+If `codex` is missing or the run fails, report the error to the user; the `wt-reviewer` review at the join stands.

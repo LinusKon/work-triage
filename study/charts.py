@@ -10,35 +10,62 @@ import statistics
 import sys
 
 THEMES = {
-    "light": {"fg": "#1f2328", "muted": "#59636e", "grid": "#d1d9e0", "base": "#8c959f", "skill": "#8250df",
-              "sonnet": "#1a7f37", "codex": "#bf8700", "bad": "#cf222e"},
-    "dark": {"fg": "#f0f6fc", "muted": "#9198a1", "grid": "#3d444d", "base": "#768390", "skill": "#ab7df8",
-             "sonnet": "#3fb950", "codex": "#d29922", "bad": "#f85149"},
+    "light": {"fg": "#1f2328", "muted": "#59636e", "faint": "#818b98", "grid": "#d1d9e0", "card": "#f6f8fa",
+              "base": "#8c959f", "skill": "#8250df", "sonnet": "#1a7f37", "codex": "#bf8700", "on": "#ffffff"},
+    "dark": {"fg": "#f0f6fc", "muted": "#9198a1", "faint": "#6e7681", "grid": "#30363d", "card": "#151b23",
+             "base": "#768390", "skill": "#ab7df8", "sonnet": "#3fb950", "codex": "#d29922", "on": "#0d1117"},
 }
 FONT = "ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif"
+MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+W = 880  # every chart has the same width, so they line up in the README
 
 
 class Svg:
-    def __init__(self, w, h, theme):
-        self.w, self.h, self.t, self.parts = w, h, THEMES[theme], []
+    def __init__(self, h, theme, title, subtitle):
+        self.w, self.h, self.t, self.parts = W, h, THEMES[theme], []
+        self.text(28, 38, title, 20, weight="650")
+        self.text(28, 62, subtitle, 13.5, "muted")
 
-    def text(self, x, y, s, size=13, color="fg", anchor="start", weight="400"):
+    def c(self, name):
+        return self.t.get(name, name)
+
+    def text(self, x, y, s, size=13, color="fg", anchor="start", weight="400", mono=False):
         s = str(s).replace("&", "&amp;").replace("<", "&lt;")
-        self.parts.append('<text x="%.1f" y="%.1f" font-size="%d" fill="%s" text-anchor="%s" font-weight="%s">%s</text>'
-                          % (x, y, size, self.t.get(color, color), anchor, weight, s))
+        fam = ' font-family="%s"' % MONO if mono else ""
+        self.parts.append('<text x="%.1f" y="%.1f" font-size="%s" fill="%s" text-anchor="%s" font-weight="%s"%s>%s</text>'
+                          % (x, y, size, self.c(color), anchor, weight, fam, s))
 
-    def line(self, x1, y1, x2, y2, color="grid", width=1, dash=None):
-        self.parts.append('<line x1="%.1f" y1="%.1f" x2="%.1f" y2="%.1f" stroke="%s" stroke-width="%s"%s/>'
-                          % (x1, y1, x2, y2, self.t.get(color, color), width,
-                             ' stroke-dasharray="%s"' % dash if dash else ""))
+    def line(self, x1, y1, x2, y2, color="grid", width=1.0, dash=None, cap="butt"):
+        self.parts.append('<line x1="%.1f" y1="%.1f" x2="%.1f" y2="%.1f" stroke="%s" stroke-width="%s" '
+                          'stroke-linecap="%s"%s/>' % (x1, y1, x2, y2, self.c(color), width, cap,
+                                                      ' stroke-dasharray="%s"' % dash if dash else ""))
 
-    def rect(self, x, y, w, h, color, opacity=1.0, rx=3):
-        self.parts.append('<rect x="%.1f" y="%.1f" width="%.1f" height="%.1f" rx="%d" fill="%s" fill-opacity="%.2f"/>'
-                          % (x, y, max(w, 0), max(h, 0), rx, self.t.get(color, color), opacity))
+    def rect(self, x, y, w, h, color, opacity=1.0, rx=4, stroke=None):
+        extra = ' stroke="%s" stroke-width="1"' % self.c(stroke) if stroke else ""
+        self.parts.append('<rect x="%.1f" y="%.1f" width="%.1f" height="%.1f" rx="%s" fill="%s" fill-opacity="%.2f"%s/>'
+                          % (x, y, max(w, 0), max(h, 0), rx, self.c(color), opacity, extra))
 
-    def dot(self, x, y, color, r=6):
-        self.parts.append('<circle cx="%.1f" cy="%.1f" r="%d" fill="%s" fill-opacity="0.85"/>'
-                          % (x, y, r, self.t.get(color, color)))
+    def card(self, x, y, w, h):
+        self.rect(x, y, w, h, "card", 1.0, 10, "grid")
+
+    def dot(self, x, y, color, r=7):
+        self.parts.append('<circle cx="%.1f" cy="%.1f" r="%s" fill="%s" stroke="%s" stroke-width="2"/>'
+                          % (x, y, r, self.c(color), self.c("card")))
+
+    def pill(self, x, y, s, color, anchor="middle", size=12.5):
+        w = 7.4 * len(s) * size / 12.5 + 16
+        x0 = x - w / 2 if anchor == "middle" else (x if anchor == "start" else x - w)
+        self.rect(x0, y - 15, w, 22, color, 1.0, 11)
+        self.text(x0 + w / 2, y, s, size, "on", "middle", "650")
+
+    def legend(self, x, y, items):
+        for name, color in items:
+            self.rect(x, y - 10, 12, 12, color, 1.0, 3)
+            self.text(x + 18, y, name, 12, "muted")
+            x += 34 + 6.6 * len(name)
+
+    def note(self, s):
+        self.text(28, self.h - 14, s, 11, "faint")
 
     def save(self, path):
         with open(path, "w", encoding="utf-8") as f:
@@ -60,79 +87,85 @@ def usd(rows, field="total_usd"):
     return [float(r[field]) for r in rows]
 
 
+def base_for(runs, rnd, tasks):
+    """Baseline runs (Opus high, no skill) for a round; round 2 reused round 1's runs for A, B and D."""
+    b = [r for r in runs if r["round"] == str(rnd) and r["task"] in tasks and r["arm"] == "base"]
+    if rnd == 2:
+        b += [r for r in runs if r["round"] == "1" and r["task"] in "ABD" and r["arm"] == "base"]
+    return b
+
+
+def pct(v):
+    """Signed whole percent with a real minus sign."""
+    return ("%+.0f %%" % (100 * v)).replace("-", "−")
+
+
 def strip_chart(runs, builds, theme, path):
-    """One panel per large build: every run as a dot, medians as lines, the change between the medians."""
-    pw, h, left, top, bottom = 400, 400, 70, 112, 60
-    s = Svg(left + pw * len(builds) + 20, h, theme)
-    s.text(left, 30, "Total cost per run on large builds", 18, weight="600")
-    s.text(left, 52, "Each dot is one complete build. Claude dollars plus Codex at API list prices.", 13, "muted")
-    top_usd = max(usd([r for r in runs if (r["round"], r["task"]) in {(b[0], b[1]) for b in builds}])) * 1.12
-    y = lambda v: top + (h - top - bottom) * (1 - v / top_usd)
-    for tick in range(0, int(top_usd) + 1):
-        s.line(left, y(tick), s.w - 20, y(tick))
-        s.text(left - 10, y(tick) + 4, "$%d" % tick, 12, "muted", "end")
-    for i, (rnd, task, skill_arm, title) in enumerate(builds):
-        x0 = left + pw * i
+    """One card per large build: every run as a dot, medians as lines, the change between the medians."""
+    s = Svg(470, theme, "Large builds: every run, with and without the skill",
+            "Total cost of one complete build. Claude dollars plus Codex at API list prices.")
+    gap, top, bottom = 20, 86, 40
+    cw = (W - 56 - gap * (len(builds) - 1)) / len(builds)
+    ymax = max(usd([r for r in runs if (r["round"], r["task"]) in {(b[0], b[1]) for b in builds}])) * 1.08
+    plot_top, plot_bot = top + 78, 470 - bottom - 58
+    y = lambda v: plot_bot - (plot_bot - plot_top) * v / ymax
+    for i, (rnd, task, skill_arm, title, sub) in enumerate(builds):
+        x0 = 28 + (cw + gap) * i
+        s.card(x0, top, cw, 470 - top - bottom)
+        s.text(x0 + 20, top + 30, title, 15, weight="650")
+        s.text(x0 + 20, top + 50, sub, 12.5, "muted")
+        for tick in range(0, int(ymax) + 1, 2):
+            s.line(x0 + 54, y(tick), x0 + cw - 18, y(tick))
+            s.text(x0 + 46, y(tick) + 4, "$%d" % tick, 11.5, "faint", "end")
         meds = {}
-        for j, (arm, color, label) in enumerate((("base", "base", "Opus 5.5 high, no skill"),
-                                                 (skill_arm, "skill", "with work-triage"))):
+        for j, (arm, color, label) in enumerate((("base", "base", "no skill"), (skill_arm, "skill", "work-triage"))):
             vals = sorted(usd(pick(runs, round=rnd, task=task, arm=arm)))
-            cx = x0 + pw * (0.3 + 0.4 * j)
-            for k, v in enumerate(vals):
-                s.dot(cx + (k - (len(vals) - 1) / 2) * 15, y(v), color)
+            cx = x0 + 54 + (cw - 72) * (0.27 + 0.46 * j)
             meds[arm] = statistics.median(vals)
-            s.line(cx - 62, y(meds[arm]), cx + 62, y(meds[arm]), color, 2.5)
-            s.text(cx + 68, y(meds[arm]) + 4, "$%.2f" % meds[arm], 12, color, "start", "600")
-            s.text(cx, h - bottom + 22, label, 12, "muted", "middle")
-            s.text(cx, h - bottom + 38, "n = %d" % len(vals), 11, "muted", "middle")
+            s.line(cx - 64, y(meds[arm]), cx + 64, y(meds[arm]), color, 3, cap="round")
+            for k, v in enumerate(vals):
+                s.dot(cx + (k - (len(vals) - 1) / 2) * 19, y(v), color)
+            s.text(cx, plot_bot + 26, label, 13, "fg", "middle", "600")
+            s.text(cx, plot_bot + 44, "median $%.2f · n = %d" % (meds[arm], len(vals)), 12, "muted", "middle")
         change = meds[skill_arm] / meds["base"] - 1
-        s.text(x0 + pw / 2, top - 30, title, 13, "fg", "middle", "600")
-        s.text(x0 + pw / 2, top - 8, "%+.0f %% median" % (100 * change), 16, "skill", "middle", "700")
+        s.pill(x0 + cw - 20, top + 34, pct(change), "skill", "end", 15)
+    s.note("Source: study/data/runs.csv, rounds 5 and 6. Baseline: Opus 5.5 high in omp, free to spawn or use Codex.")
     s.save(path)
 
 
 def journey_chart(runs, steps, theme, path):
     """Median total cost of the skill relative to the no-skill baseline, version by version."""
-    w, h, left, top, bottom = 820, 360, 70, 80, 78
-    s = Svg(w, h, theme)
-    s.text(left, 52, "Median total cost of the skill against Opus 5.5 high without it, same tasks, per round.", 13,
-           "muted")
     vals = []
-    for rnd, tasks, arm, label, sub in steps:
-        b = usd([r for r in runs if r["round"] == str(rnd) and r["task"] in tasks and r["arm"] == "base"
-                 and r["head_level"] == "high"])
+    for rnd, tasks, arm, label, sub, group in steps:
+        b = usd(base_for(runs, rnd, tasks))
         k = usd([r for r in runs if r["round"] == str(rnd) and r["task"] in tasks and r["arm"] == arm])
-        if rnd == 2:  # round 2 reused round 1's base runs for A, B, D
-            b += usd([r for r in runs if r["round"] == "1" and r["task"] in "ABD" and r["arm"] == "base"])
-        vals.append((label, sub, statistics.median(k) / statistics.median(b) - 1))
-    s.text(left, 30, "The skill against no skill, version by version: from %+.0f %% to %+.0f %%"
-           % (100 * vals[0][2], 100 * vals[-1][2]), 18, weight="600")
-    lo, hi = min(v for _, _, v in vals + [("", "", -0.5)]), max(v for _, _, v in vals + [("", "", 0.9)])
-    y = lambda v: top + (h - top - bottom) * (hi - v) / (hi - lo)
-    for tick in (-0.5, -0.25, 0, 0.25, 0.5, 0.75):
-        s.line(left, y(tick), w - 20, y(tick), "fg" if tick == 0 else "grid", 1.2 if tick == 0 else 1)
-        s.text(left - 10, y(tick) + 4, "%+d %%" % (100 * tick), 12, "muted", "end")
-    bw = (w - left - 40) / len(vals)
-    for i, (label, sub, v) in enumerate(vals):
-        x = left + 10 + bw * i
+        vals.append((label, sub, group, statistics.median(k) / statistics.median(b) - 1))
+    s = Svg(400, theme, "Version by version: from %s to %s" % (pct(vals[0][3]), pct(vals[-1][3])),
+            "Median total cost of the skill against the same model without it, on the same tasks.")
+    left, top, bottom = 84, 96, 92
+    lo, hi = min(-0.5, min(v[3] for v in vals)) - 0.2, max(0.5, max(v[3] for v in vals) + 0.14)
+    y = lambda v: top + (400 - top - bottom) * (hi - v) / (hi - lo)
+    s.card(28, top - 18, W - 56, 400 - top - bottom + 78)
+    for tick in (-0.5, -0.25, 0, 0.25, 0.5, 0.75, 1.0):
+        if lo <= tick <= hi:
+            s.line(left, y(tick), W - 46, y(tick), "muted" if tick == 0 else "grid", 1.4 if tick == 0 else 1)
+            s.text(left - 10, y(tick) + 4, pct(tick) if tick else "no skill", 11.5, "faint", "end")
+    bw = (W - left - 60) / len(vals)
+    for i, (label, sub, group, v) in enumerate(vals):
+        x = left + 8 + bw * i
         color = "skill" if v < 0 else "base"
-        s.rect(x + bw * 0.2, min(y(v), y(0)), bw * 0.6, abs(y(v) - y(0)), color, 0.9)
-        s.text(x + bw / 2, (y(v) - 8) if v >= 0 else (y(v) + 18), "%+.0f %%" % (100 * v), 14, color, "middle", "700")
-        s.text(x + bw / 2, h - bottom + 24, label, 13, "fg", "middle", "600")
-        s.text(x + bw / 2, h - bottom + 42, sub, 11, "muted", "middle")
+        s.rect(x + bw * 0.22, min(y(v), y(0)), bw * 0.56, abs(y(v) - y(0)), color, 1.0, 5)
+        s.text(x + bw / 2, (y(v) - 9) if v >= 0 else (y(v) + 20), pct(v), 15, color, "middle", "700")
+        s.text(x + bw / 2, 400 - bottom + 26, "skill " + label, 13, "fg", "middle", "600")
+        s.text(x + bw / 2, 400 - bottom + 44, sub, 12, "muted", "middle")
+    s.note("Source: study/data/runs.csv. Round 3 changed the head level together with the skill and is shown with the small tasks.")
     s.save(path)
 
 
 def split_chart(runs, builds, theme, path):
     """Mean cost per run split into head session, Opus subagents, Sonnet subagents and Codex."""
-    w, h, left, top = 820, 96 + 62 * 2 * len(builds), 200, 84
-    s = Svg(w, h, theme)
-    s.text(24, 30, "Where the money goes", 18, weight="600")
-    s.text(24, 52, "Mean cost per run, by who did the work. Codex at API list prices.", 13, "muted")
-    parts = (("head session (Opus high)", "base"), ("Opus subagents", "skill"), ("Sonnet subagents", "sonnet"),
-             ("Codex (list price)", "codex"))
     rows_ = []
-    for rnd, task, skill_arm, title in builds:
+    for rnd, task, skill_arm, title, sub in builds:
         for arm, label in (("base", "no skill"), (skill_arm, "work-triage")):
             g = pick(runs, round=rnd, task=task, arm=arm)
             n = len(g)
@@ -140,93 +173,96 @@ def split_chart(runs, builds, theme, path):
             sonnet = sum(usd(g, "sonnet_usd")) / n
             opus_sub = sum(usd(g, "opus_usd")) / n - head
             codex = sum(usd(g, "codex_usd")) / n
-            rows_.append(("%s · %s" % (title.split(" · ")[0], label), (head, opus_sub, sonnet, codex)))
-    scale = (w - left - 80) / max(sum(v) for _, v in rows_)
-    for i, (label, vals) in enumerate(rows_):
-        yy = top + 62 * i
-        s.text(left - 12, yy + 22, label, 12, "fg", "end")
+            rows_.append((title.split(" · ")[0], label, (head, opus_sub, sonnet, codex)))
+    h = 172 + 54 * len(rows_) + 16 * (len(builds) - 1)
+    s = Svg(h, theme, "Where the money goes", "Mean cost per run, by who did the work.")
+    parts = (("main session, Opus high", "base"), ("Opus subagents", "skill"), ("Sonnet workers", "sonnet"),
+             ("Codex, list price", "codex"))
+    s.card(28, 84, W - 56, h - 84 - 36)
+    s.legend(52, 112, parts)
+    left = 206
+    scale = (W - left - 120) / max(sum(v) for _, _, v in rows_)
+    yy = 132
+    for i, (build, label, vals) in enumerate(rows_):
+        if i and i % 2 == 0:
+            yy += 16
+        if i % 2 == 0:
+            s.text(52, yy + 23, build, 13, "fg", weight="650")
+        s.text(left - 14, yy + 23, label, 12.5, "muted", "end")
         x = left
         for (name, color), v in zip(parts, vals):
-            s.rect(x, yy + 4, v * scale, 28, color, 0.9)
-            if v * scale > 44:
-                s.text(x + v * scale / 2, yy + 23, "$%.2f" % v, 11, "#ffffff", "middle", "600")
+            if v * scale >= 1:
+                s.rect(x, yy + 5, v * scale - 2, 28, color, 1.0, 4)
+            if v * scale > 46:
+                s.text(x + v * scale / 2 - 1, yy + 24, "$%.2f" % v, 11.5, "on", "middle", "650")
             x += v * scale
-        s.text(x + 8, yy + 23, "$%.2f" % sum(vals), 13, "fg", "start", "700")
-    x = left
-    for name, color in parts:
-        s.rect(x, h - 26, 12, 12, color, 0.9)
-        s.text(x + 18, h - 15, name, 11, "muted")
-        x += 34 + 6.2 * len(name)
+        s.text(x + 8, yy + 24, "$%.2f" % sum(vals), 14, "fg", "start", "700")
+        yy += 54
+    s.note("Source: study/data/runs.csv, rounds 5 and 6, five runs per bar.")
     s.save(path)
 
 
 def defect_chart(defects, builds, theme, path):
-    """Major defects per run after blind, uniform grading."""
-    pw, h, left, top, bottom = 400, 300, 60, 84, 50
-    s = Svg(left + pw * len(builds) + 20, h, theme)
-    s.text(left, 30, "Quality: major defects per build, graded blind", 18, weight="600")
-    s.text(left, 52, "One rubric, one executable probe per defect, run on every build of both arms.", 13, "muted")
-    top_n = max(int(r["major"]) for r in defects) + 1
-    y = lambda v: top + (h - top - bottom) * (1 - v / top_n)
-    for tick in range(0, top_n + 1, 2):
-        s.line(left, y(tick), s.w - 20, y(tick))
-        s.text(left - 10, y(tick) + 4, tick, 12, "muted", "end")
-    for i, (rnd, task, skill_arm, title) in enumerate(builds):
-        x0 = left + pw * i
-        s.text(x0 + pw / 2, top - 10, title, 13, "fg", "middle", "600")
+    """Major defects per run after blind, uniform grading: one square per defect."""
+    s = Svg(360, theme, "Quality: major defects per build, graded blind",
+            "One rubric and one executable probe per defect, run on every build of both arms. One square is one defect.")
+    gap, top, bottom = 20, 86, 40
+    cw = (W - 56 - gap * (len(builds) - 1)) / len(builds)
+    sq, base_y = 15, 360 - bottom - 62
+    for i, (rnd, task, skill_arm, title, sub) in enumerate(builds):
+        x0 = 28 + (cw + gap) * i
+        s.card(x0, top, cw, 360 - top - bottom)
+        s.text(x0 + 20, top + 30, title, 15, weight="650")
         for j, (arm, color, label) in enumerate((("base", "base", "no skill"), (skill_arm, "skill", "work-triage"))):
             vals = [int(r["major"]) for r in defects if r["task"] == task and r["arm"] == arm]
-            bw = 22
-            cx = x0 + pw * (0.28 + 0.44 * j)
+            cx = x0 + cw * (0.27 + 0.46 * j)
             for k, v in enumerate(vals):
-                bx = cx + (k - len(vals) / 2) * (bw + 4)
-                s.rect(bx, y(v), bw, y(0) - y(v), color, 0.9)
-                s.text(bx + bw / 2, y(v) - 5, v, 11, "muted", "middle")
-            s.text(cx, h - bottom + 20, "%s · sum %d" % (label, sum(vals)), 12, "muted", "middle")
+                bx = cx + (k - len(vals) / 2) * (sq + 9)
+                for n in range(v):
+                    s.rect(bx, base_y - (n + 1) * (sq + 3), sq, sq, color, 1.0, 3)
+                s.text(bx + sq / 2, base_y + 15, v, 11.5, "faint", "middle")
+            s.line(cx - 70, base_y, cx + 70, base_y, "grid")
+            s.text(cx, base_y + 38, label, 13, "fg", "middle", "600")
+            s.text(cx, base_y + 55, "%d in 5 builds" % sum(vals), 12, "muted", "middle")
+    s.note("Source: study/data/defects.csv (Python 3.12). Most kinds are strict readings of the spec that both arms share.")
     s.save(path)
 
 
 def small_chart(runs, theme, path):
     """Small tasks: median total per round for no skill, the skill, and (round 3) no skill at a medium head."""
-    groups = [(1, "ABCD", "skill21", "round 1 · skill 2.1"), (2, "ABCD", "skill22", "round 2 · skill 2.2"),
-              (3, "EFG", "skill23", "round 3 · skill 2.3 at a medium head")]
-    w, h, left, top, bottom = 820, 330, 70, 96, 56
-    s = Svg(w, h, theme)
-    s.text(left, 30, "Small tasks: the skill saves nothing", 18, weight="600")
-    s.text(left, 52, "Work that fits one session, median total cost per run. Lowering the head to Opus medium", 13,
-           "muted")
-    s.text(left, 70, "saved more than the skill did, so the skill now only says: do it alone.", 13, "muted")
+    groups = [(1, "ABCD", "skill21", "Round 1", "skill 2.1"), (2, "ABCD", "skill22", "Round 2", "skill 2.2"),
+              (3, "EFG", "skill23", "Round 3", "skill 2.3, head at medium")]
+    s = Svg(400, theme, "Small tasks: the skill saves nothing",
+            "Work that fits one session, median total cost per run. Lowering the head to Opus medium saved more.")
     data = []
-    for rnd, tasks, arm, label in groups:
-        b = usd([r for r in runs if r["round"] == str(rnd) and r["task"] in tasks and r["arm"] == "base"])
-        if rnd == 2:
-            b += usd([r for r in runs if r["round"] == "1" and r["task"] in "ABD" and r["arm"] == "base"])
+    for rnd, tasks, arm, label, sub in groups:
+        b = usd(base_for(runs, rnd, tasks))
         k = usd([r for r in runs if r["round"] == str(rnd) and r["task"] in tasks and r["arm"] == arm])
         m = usd([r for r in runs if r["round"] == str(rnd) and r["task"] in tasks and r["arm"] == "basemed"])
         bars = [(statistics.median(b), "base"), (statistics.median(k), "skill")]
         if m:
             bars.append((statistics.median(m), "sonnet"))
-        data.append((label, bars))
-    top_usd = max(v for _, bars in data for v, _ in bars) * 1.25
-    y = lambda v: top + (h - top - bottom) * (1 - v / top_usd)
+        data.append((label, sub, bars))
+    left, top, bottom = 84, 126, 92
+    s.card(28, 84, W - 56, 400 - 84 - 36)
+    s.legend(52, 112, (("no skill, Opus high", "base"), ("work-triage", "skill"), ("no skill, Opus medium", "sonnet")))
+    top_usd = max(v for _, _, bars in data for v, _ in bars) * 1.22
+    y = lambda v: 400 - bottom - (400 - top - bottom) * v / top_usd
     for tick in (0, 0.5, 1.0, 1.5):
         if tick <= top_usd:
-            s.line(left, y(tick), w - 20, y(tick))
-            s.text(left - 10, y(tick) + 4, "$%.2f" % tick, 12, "muted", "end")
-    gw = (w - left - 40) / len(data)
-    for i, (label, bars) in enumerate(data):
-        x = left + 20 + gw * i
-        bw = gw * 0.22
+            s.line(left, y(tick), W - 46, y(tick))
+            s.text(left - 10, y(tick) + 4, "$%.2f" % tick, 11.5, "faint", "end")
+    gw = (W - left - 60) / len(data)
+    for i, (label, sub, bars) in enumerate(data):
+        x = left + 8 + gw * i
+        bw = 54
         for j, (v, color) in enumerate(bars):
-            bx = x + gw * 0.5 + (j - len(bars) / 2) * (bw + 6)
-            s.rect(bx, y(v), bw, y(0) - y(v), color, 0.9)
-            s.text(bx + bw / 2, y(v) - 6, "$%.2f" % v, 12, color, "middle", "600")
-        s.text(x + gw * 0.5, h - bottom + 22, label, 12, "fg", "middle", "600")
-    x = left
-    for name, color in (("no skill, Opus high", "base"), ("work-triage", "skill"), ("no skill, Opus medium", "sonnet")):
-        s.rect(x, h - 22, 12, 12, color, 0.9)
-        s.text(x + 18, h - 11, name, 11, "muted")
-        x += 40 + 6.2 * len(name)
+            bx = x + gw * 0.5 + (j - len(bars) / 2) * (bw + 8)
+            s.rect(bx, y(v), bw, y(0) - y(v), color, 1.0, 5)
+            s.text(bx + bw / 2, y(v) - 7, "$%.2f" % v, 12.5, color, "middle", "650")
+        s.text(x + gw * 0.5, 400 - bottom + 24, label, 13, "fg", "middle", "600")
+        s.text(x + gw * 0.5, 400 - bottom + 42, sub, 12, "muted", "middle")
+    s.note("Source: study/data/runs.csv, rounds 1 to 3, nine to twelve runs per bar.")
     s.save(path)
 
 
@@ -235,13 +271,15 @@ def main():
     os.makedirs(out, exist_ok=True)
     runs = load(os.path.join(data, "runs.csv"))
     defects = load(os.path.join(data, "defects.csv")) if os.path.exists(os.path.join(data, "defects.csv")) else []
-    builds = [b for b in (("5", "H", "skill25", "Build H · dataops · skill 2.5"),
-                          ("6", "I", "skill26", "Build I · tasktrack · skill 2.6"))
+    builds = [b for b in (("5", "H", "skill25", "Build H · dataops", "20 plug-in operations · skill 2.5"),
+                          ("6", "I", "skill26", "Build I · tasktrack", "layered task tracker · skill 2.6"))
               if pick(runs, round=b[0], task=b[1], arm=b[2])]
     # Round 3 changed the head level together with the skill; it is shown in the small-tasks chart with its
-    # medium-head baseline instead of here.
-    steps = [s for s in ((1, "ABCD", "skill21", "2.1", "small tasks"), (2, "ABCD", "skill22", "2.2", "small tasks"),
-                         (5, "H", "skill25", "2.5", "large build H"), (6, "I", "skill26", "2.6", "large build I"))
+    # medium-head baseline instead of in the journey.
+    steps = [s for s in ((1, "ABCD", "skill21", "2.1", "small tasks", "small"),
+                         (2, "ABCD", "skill22", "2.2", "small tasks", "small"),
+                         (5, "H", "skill25", "2.5", "large build H", "large"),
+                         (6, "I", "skill26", "2.6", "large build I", "large"))
              if [r for r in runs if r["round"] == str(s[0]) and r["arm"] == s[2]]]
     for theme in THEMES:
         strip_chart(runs, builds, theme, os.path.join(out, "cost-large-builds-%s.svg" % theme))

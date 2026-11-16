@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import collect  # noqa: E402
 
 VERSIONS = {"base": "", "basemed": "", "basespawn": "", "skill201": "2.0.1", "skill21": "2.1.0", "skill22": "2.2.0",
-            "skill23": "2.3.0", "skill24": "2.4.0", "skill25": "2.5.0", "skill26": "2.6.0"}
+            "skill23": "2.3.0", "skill24": "2.4.0", "skill25": "2.5.0", "skill26": "2.6.0", "skill261": "2.6.1"}
 HEAD = {"basemed": "medium", "skill23": "medium"}
 FOLDERS = [("runs-v1", 1), ("runs-v2", 2), ("runs-v3", 3), ("runs-v45", 5), ("runs", 6)]
 FIELDS = ["round", "task", "arm", "rep", "skill_version", "head_level", "total_usd", "claude_usd", "codex_usd",
@@ -42,6 +42,8 @@ def rows(study):
                 rnd_here = rnd
             if folder == "runs" and r["task"] == "H":
                 note = "regression check on build H, no reviews"
+            if r["arm"] == "skill261":
+                note = "control run after the wording-only release 2.6.1, no reviews"
             key = (rnd_here, name)
             if key in seen:
                 continue

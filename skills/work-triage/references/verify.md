@@ -1,7 +1,8 @@
 # Verify: reviews and fix rounds
 
 Detail behind `spawn.md` section "4. Verify: reviews and fix rounds". Waves and joins: `references/schedule.md`;
-chains: `references/sequential.md`; running a Codex review: `references/codex-review.md`.
+chains: `references/sequential.md`; running a Codex review: `references/codex-review.md`. The parent (the main
+session the user talks to) plans the reviews and decides what gets fixed.
 
 ## Order of checks
 
@@ -16,36 +17,36 @@ chains: `references/sequential.md`; running a Codex review: `references/codex-re
 | Review point | Who | Rounds |
 |---|---|---|
 | Leaf row with a check that stands alone | no review; the parent reads the check output | — |
-| Join: the merged result of several rows | one fresh-context review against the spec, after the consumers | one fix round |
-| Security or secrets row | one review covering both, Opus 5.5 `high`, scoped to the floor files and their tests; `xhigh` only as escalation | one fix round |
-| Other floor row (interface, migration or irreversible prepare) | covered by the join or final review before its gate; may be cross-family | — |
-| Final integration | cross-family (below); it replaces the same-family review | one fix round |
+| Join: the merged result of several rows | one `wt-reviewer` review against the contract and the hardening list, after the consumers | one fix round |
+| Security or secrets rows | one `wt-reviewer` review scoped to those files and their tests, instead of the join review for them; `xhigh` only when it finds a major issue or no test covers the risky path | one fix round |
+| Other floor row (interface, migration or irreversible prepare) | covered by the one review before its gate (the join review where there is one) | — |
 | Before anything irreversible, paid or outward | a prepare row, then the gate (`Run as` `user`) | — |
 
-- **Acceptance is not review.** Before rows start that build on a row, the parent accepts it: reads the output
-  and the check. That costs no review row, because one wrong assumption there would send every later row the
-  wrong way and a reading catches it; "reviewed at 10" in a `Check` cell means the later join review.
-- A row that starts after several rows of one wave (read `Starts after`) is a **join**: review the merged result there, once,
-  after the consumers, because the merge is the first point where rows whose own checks passed can still fail together (shared
-  state was the largest failure class of coding-agent teams, 33.2 %) and one check there sees all of it (Evidence: CAID).
-- A **final review** is planned when the change has two or more writing rows and ends in a gate (a push, a PR, a run on real data): it is the
-  last review row before that gate, because that is the last cheap point to catch an integration fault.
-- The plan header states the count (`Reviews: 2, at 10 and 11. Fix rounds: 1.`), because reviews added per step
-  become the default and most of them find nothing. A review row has "review" among the first two words of its
-  `Row` cell ("Review …", "Final review …", "Join review …", "Security review …"), so the count can be checked.
+- **Reading a row is not a review.** Before rows start that build on a row, the parent accepts it: it reads the
+  output and the check. That costs no review row, because one wrong assumption there would send every later row
+  the wrong way and a reading catches it; "reviewed at 8" in a `Check` cell means the later join review.
+- A row that starts after several rows of one wave (read `Starts after`) is a **join**. Review the merged result
+  there, once, after the consumers, because the merge is the first point where rows whose own checks passed can
+  still fail together. Shared state was the largest failure class of coding-agent teams (33.2 %, CAID in the
+  Evidence table below), and one check at the join sees all of it.
+- **No other review by default.** No final review before the gate and no cross-family review are added, because
+  the join review already sees the merged result. A Codex review runs only when the user asks for one.
+- The plan header states the count (`Reviews: 1, at 8. Fix rounds: 1.`), because reviews added per step become
+  the default and most of them find nothing. A review row has "review" among the first two words of its `Row`
+  cell ("Review …", "Join review …", "Security review …"), so the count can be checked.
 
 ## Who reviews
 
-- **Always a fresh context** (a subagent or Codex run that never saw the author's conversation), given the spec
+- **Always a fresh context** (a `wt-reviewer` subagent that never saw the author's conversation), given the spec
   and the artefact, not the author's summary, because a reviewer who reads the author's reasoning is swayed by it.
-- **Join and final reviews**: Opus 5.5 `high` or `gpt-6-astra` `high`. The final review is cross-family: Claude's
-  work → `gpt-6-astra` `high` (`scripts/codex_row.sh review`); Codex's work → Opus 5.5 `high`; mixed work → the
-  family that wrote less of it. Only there, because the evidence for cross-family review is indirect and it
-  costs a second harness. The reviewer need not match the author's rung: the fresh context finds the misses.
-- **Security and secrets rows** are never in a Codex review's scope, the final one included (list the rows or
-  paths it skips), because their floor keeps them with Claude: one Opus 5.5 `high` review, `xhigh` on escalation.
-- **One perspective per reviewer** on critical rows (security, tests, spec fit) and small slices, because directed
-  reviews of small diffs find more than broad ones.
+- **The join review** is `wt-reviewer` (Opus 5.5 `high`). The reviewer need not match the author's rung: the fresh
+  context finds the misses. A Codex review or second opinion (`gpt-6-astra` `high`, `scripts/codex_row.sh review`)
+  happens only when the user asks for one, because it is the most expensive model and the evidence for
+  cross-family review is indirect.
+- **Security and secrets rows** are never in a Codex review's scope (list the rows or paths it skips), because
+  their floor keeps them with Claude: one `wt-reviewer` review, `xhigh` only on the conditions above.
+- **One perspective per review:** the join review checks the merged result against the contract, the security
+  review only the floor files and their tests, because directed reviews of small diffs find more than broad ones.
 
 ## Reviewer prompt (template)
 
@@ -69,11 +70,12 @@ something, and fixing every finding adds layers nobody asked for.
   intent: it drops out-of-scope, style and unproven findings; a blocker it cannot judge goes to the user.
 - **One fix round is planned** per review point (in a chain, per link), and the header's `Fix rounds` counts
   exactly that, because the first round carries most of the gain.
-- **A second only while a mechanical check still fails**, because a second round driven by model critique alone made
-  results worse in published measurements (math and QA, 2023–24 models; no study of coding fix rounds). A row's own
-  failed check escalates by `spawn.md`'s ladder ("During the run"; `fails twice → gpt-6-astra high`), not by more rounds.
-- **After two rounds the parent stops and reports to the user** (what failed, what was tried, the evidence),
-  because a third round without new information repeats the second.
+- **A failing check after the fix round follows the failure ladder** in `spawn.md` ("During the run"), not more
+  critique rounds: back to the author once, then a small fix by the parent or the row one rung up. A second round
+  driven by model critique alone made results worse in published measurements (math and QA, 2023–24 models; no
+  study of coding fix rounds).
+- **After two failed rounds on one row the parent stops and tells the user** (what failed, what was tried, the
+  evidence), because a third round without new information repeats the second.
 
 ## What "done" contains
 

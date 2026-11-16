@@ -6,6 +6,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [2.6.1] - 2026-11-16
+
+### Changed
+
+- Wording and consistency only: the references follow `SKILL.md` (Codex optional, one review at the join, no Fable
+  orchestrator, one failure ladder), terms are defined where first used, the charts are redrawn.
+
+### Added
+
+- `THIRD_PARTY_NOTICES.md` for the Codex references adapted from psdwizzard/claude-setup (MIT).
+
 ## [2.6.0] - 2026-11-16
 
 ### Changed

@@ -16,6 +16,7 @@ mkdir -p "$out"
 
 level=high
 case "$arm" in
+    skill261) skill="$STUDY/skills/2.6.1/work-triage" ;;
     skill26)  skill="$STUDY/skills/2.6.0/work-triage" ;;
     skill25)  skill="$STUDY/skills/2.5.0/work-triage" ;;
     skill24)  skill="$STUDY/skills/2.4.0/work-triage" ;;

@@ -1,9 +1,13 @@
-# Calibration on the author's own tasks (2026-11-13)
+# The calibration benchmark and the study
 
-Benchmark: tasks, runner and raw results (`results/runs.jsonl`, `results/codex.jsonl`) are kept with the
-skill's source repository. 271 runs, $94.88 of Claude usage (list price as reported
-by `claude -p`), Codex runs on the ChatGPT plan. Each run: a fresh copy of a small Python project,
-`claude -p` or `codex exec` with file and python tools only, then hidden tests the agent never saw.
+Two bodies of evidence stand behind this skill. The **calibration benchmark** (2026-11-13) ran single settings of
+model and level on small tasks, one session per run, to find the cheapest setting that passes. The **study**
+(2026-11-16, 95 runs in six rounds) ran sessions with the skill against sessions without it on tasks of its own;
+its numbers are in items 6 to 8 below. Both judge a run by hidden acceptance tests: tests the agent never saw.
+
+Calibration benchmark: 271 runs, $94.88 of Claude usage (list price as reported by `claude -p`), Codex runs on
+the ChatGPT plan. Each run: a fresh copy of a small Python project, `claude -p` or `codex exec` with file and
+python tools only, then hidden tests the agent never saw.
 
 ## The tasks
 
@@ -49,7 +53,7 @@ Where the cheap settings failed:
 - The triage task (T8) passed on every setting down to Sonnet `low` after two grader fixes; Opus `low`
   and `medium` and Sonnet `medium` 3 of 3 each.
 
-## What the skill takes from it
+## What the skill takes from them
 
 1. For a bounded coding step (one repo, one session, a goal that can be checked), more than Sonnet `high`
    or Opus `low` bought nothing on these tasks, including the hard ones. Opus `high` cost 1.6× Opus `low`,
@@ -59,30 +63,26 @@ Where the cheap settings failed:
 3. `xhigh` and Fable are escalations, not defaults: no task here needed them.
 4. Codex: `gpt-6.1-sol` `medium` is the bulk lane (36 of 36). `gpt-6-luna` only for transforms with an
    obvious result and a check that stands alone, never for security or edge-case work. `gpt-6-astra`
-   `high` passed everything but was the slowest; keep it for second opinions and as the escalation.
+   `high` passed everything but was the slowest; keep it for second opinions the user asks for.
 5. Judge a triage against two fixed plans on the same tasks: every row on Opus 5.5 `medium` (always-mid)
    and every row on Opus 5.5 `high` (best single). It earns its place only by beating always-mid on cost
    at the same pass rate.
-6. Spawning has its own price (2026-11-16, one run each, Opus 5.5 `high` parent, a six-step stdlib Python plan:
-   interface, three small modules, a CLI, a README): the parent alone, in order, cost $0.50 in 2 minutes (35 own
-   tests passing); the 2.0.1 triage with three Codex rows, a Sonnet row and an Opus review cost $2.38 Claude plus
-   81k Codex tokens in 11 minutes, $1.98 of it in the parent; every row as an Opus `medium` subagent cost $2.85.
-   Briefs, waits and reading results cost more than the rows saved, hence "size first" in SKILL.md section 1.
-   One task, one run per setup, own tests only: a direction, not a measurement of quality.
-7. Skill against no skill (2026-11-16, 28 runs on four tasks with hidden acceptance tests and blind reviews,
-   `study/results.md` in the source repository): every run passed its hidden tests. 2.1.0 cost a median $1.19
-   against $0.67 without the skill; it was cheaper only where the base session split small work into
-   subagents (task D, −36 %). Costs came from reading the skill, separate `xhigh` and `high` floor reviews, and
-   output tokens; 2.2.0 answers with a lean core, one floor review and the "work economically" rules.
-8. Rounds 2 and 3 (2026-11-16, 51 more runs, three of the seven tasks held out): with equal hidden-test results,
-   2.2.0 cost −10 % in total and +6 % in the median against no skill at Opus `high`; 2.3.0 at Opus `medium` cost
-   −14 % in the median against no skill at `high` and +37 % against no skill at `medium`. Lowering the session to
-   `medium` alone saved 37 % but drew major review findings in 2 of 9 runs (float overflow in a mean, symlink
-   races), against 0 of 9 at `high`. One Sonnet worker for a whole small task cost $0.12–0.30, less than the
-   parent's overhead around it. Hence 2.4.0: the head stays at `high`, small work is never delegated, and the
-   hardening pass names those defect kinds. Large builds with many workers are not measured yet.
+6. **Study, small tasks** (hidden acceptance tests, blind reviews; medians per run, total cost unless marked).
+   Round 1 (skill 2.1): $1.38 against $0.67 without the skill ($1.19 against $0.67 in Claude dollars only).
+   Costs came from reading the skill, separate `xhigh` and `high` floor reviews, and output tokens. Round 2
+   (skill 2.2, a lean core, one floor review and the "work economically" rules): $0.78 against $0.74.
+7. **Study, the level of the parent** (the main session the user talks to). Round 3 (skill 2.3 with the parent at
+   `medium`, new small tasks): $0.50 against $0.77 for no skill at `high` and $0.37 for no skill at `medium`.
+   Lowering the level alone cut total cost by 52 % (37 % in Claude dollars). Sessions at `medium` drew major
+   review findings in 2 of 9 runs (3 findings, among them float overflow in a mean and symlink races; two were
+   security, both in one run); sessions at `high` in 0 of 9. Hence 2.4: the parent stays at `high`, small work
+   is not delegated, and the hardening pass names those defect kinds.
+8. **Study, large builds.** Round 5 (skill 2.5, build H): median $4.11 against $6.06, −32.2 % (exact one-sided
+   rank-sum p = 0.0079), hidden test 5/5 and 5/5, major defects after blind grading 15 against 14. Round 6
+   (skill 2.6, build I): median $4.58 against $7.76, −41.1 %, p = 0.0079, hidden test 5/5 and 5/5, major defects
+   17 against 27 (Python 3.12). Hence section 2 of SKILL.md: a parent at `high`, few batched workers, one review.
 
-## What it does not show
+## What the calibration benchmark does not show
 
 - Single-session tasks of up to ~20 files with a checkable goal. No multi-hour unattended runs, no work
   across several services, no product or taste judgment, no production systems. The floors for those
@@ -91,6 +91,3 @@ Where the cheap settings failed:
   the security floors stay even though Sonnet `medium` passed T4.
 - Small samples: 3–6 runs per cell for the cheap settings, 1 for the expensive ones. A 1-in-3 miss rate
   would often not show in one run.
-
-Re-run after a model release: `python3 run.py --configs <…> --reps 3 --budget-usd <cap>` in the
-calibration folder, then `python3 analyze.py`.

@@ -1,26 +1,26 @@
 ---
 name: work-triage
-description: "Decides who runs each piece of work and at what level: Claude Sonnet 5.5, Opus 5.5 or Fable 5.2 with a thinking level, or Codex (gpt-6.1-sol, gpt-6-luna, gpt-6-astra, gpt-6.1-terra) with a reasoning level. Keeps the main session strong (Opus 5.5 high), runs work that fits one session solo, and for large builds orchestrates few, cheap, batched workers with an explicit model each; holds floors and user gates, and ends with a spec check and a hardening pass. Load before presenting any plan of three or more steps or any plan with a step that spends money, touches secrets or leaves the machine; before spawning subagents or a swarm; whenever work goes to Codex (implementation, review or second opinion, checks of a local app); and when the user asks which model or level a task needs."
+description: "Decides who does each piece of agent work and at what thinking level: Claude Sonnet 5.5, Opus 5.5 or Fable 5.2, or Codex (gpt-6.1-sol, gpt-6-astra, gpt-6.1-terra, gpt-6-luna). Work that fits one session is done by that session alone; a large build is split into a few batches, each given to the cheapest model and level that fits, while the main session keeps its own. Holds floors for critical work and gates only the user passes. Load before presenting any plan of three or more steps or any plan with a step that spends money, touches secrets or leaves the machine; before spawning subagents; whenever work goes to Codex; and when the user asks which model or level a task needs."
 metadata:
-  version: 2.6.0
+  version: 2.6.1
 ---
 
 # Work triage
 
-The best result for the fewest tokens: a strong head, cheap hands. The session keeps its model and level (Opus 5.5
-`high` is the default) and saves on the workers, never on itself: in the study behind this skill
-(`references/calibration.md`) sessions lowered to `medium` drew major review findings in 2 of 9 runs, sessions at
+The goal is the best result for the fewest tokens. Two words used throughout: the **parent** is the main session
+the user talks to; a **worker** is a subagent the parent spawns. The parent keeps its model and level (Opus 5.5
+`high` is the default) and saves on the workers, not on itself: in the study behind this skill (summarised in
+`references/calibration.md`) sessions lowered to `medium` drew major review findings in 2 of 9 runs, sessions at
 `high` in 0 of 9.
 
 ## 1. Size first
 
-- **The work fits one session** (roughly up to ten files or a thousand lines to write, no long research): do it
-  solo, in order. Do not delegate any of it: at this size every form of delegation measured cost more than doing
-  the work (three rounds, seven tasks). Write `Triage: 1 Opus 5.5·high (parent), solo.` with the session's real
-  model and level, add a gate only for an action the plan has, then go to sections 5 and 6. Sections 3 and 4 still
-  hold.
-- **The work is larger** (more than one context holds comfortably, many independent modules, a long research
-  sweep), or the user asks for subagents: orchestrate it as section 2 says.
+- **Up to about ten files or a thousand lines to write, and no long research:** the parent does the work alone, in
+  order. It delegates none of it: at this size every form of delegation measured cost more than doing the work
+  (three rounds, seven tasks). Write `Triage: 1 Opus 5.5·high (parent), solo.` with the session's real model and
+  level, add a gate only for an action the plan has, then go to sections 5 and 6. Sections 3 and 4 still hold.
+- **More than that** (many independent modules, more than one context holds comfortably, a long research sweep),
+  or the user asks for subagents: orchestrate it as section 2 says.
 
 ## 2. Orchestrating a build
 
@@ -53,10 +53,11 @@ parent's model and level. So:
 5. **One batch, one wait.** Spawn the whole wave as one `tasks[]` call and wait once; do not poll, and do not work
    on the workers' files meanwhile.
 6. **The parent does not re-read the workers' code.** It reads the five-line reports, runs the whole suite once
-   and reads failures only. A failing module goes back to its author once (`write agent://<name>`); after that the
-   parent fixes it.
-7. **One review at the join:** one `wt-reviewer` checks the merged result against the contract and the hardening
-   list, not file by file. One fix round. Security files get section 4's review instead.
+   and reads failures only. A failing module goes back to its author once (`write agent://<name>`); what happens
+   after that is in section 3, "When a check fails".
+7. **One review at the join** (the point where the workers' results are merged): one `wt-reviewer` checks the
+   merged result against the contract and the hardening list, not file by file. One fix round. Security files get
+   section 4's review instead.
 
 **Fable 5.2** only after Opus `xhigh` had full context and failed on architecture or a root cause that spans several
 systems, or for frontier-hard work longer than one context. Never for security, spec'd work, research, orchestration
@@ -64,7 +65,8 @@ or triage: there it costs more for the same result (`references/facts.md`).
 
 ## 3. Floors
 
-A step that touches a floor gets at least this, solo or not. Look for floors a plan does not name.
+A floor is the lowest model and level a step may get because of what it touches. It holds whether the parent works
+alone or not. Look for floors a plan does not name.
 
 | Touches | Floor |
 |---|---|
@@ -80,14 +82,16 @@ A step that touches a floor gets at least this, solo or not. Look for floors a p
 
 If `references/local.md` exists, read it: it holds this installation's own floors and gates.
 
-**Escalation.** A check that fails once: same model, one level up. Fails again with full context: next model up
-(Sonnet → Opus `high` → `xhigh`), then Fable only under section 2's condition. Security stops at Opus `xhigh`, then
-the user.
+**When a check fails.** The module goes back to its author once. If it fails again, the parent fixes it when the
+fix is small; otherwise the work moves one step up (`wt-worker` → `wt-worker-hard` → Opus `high` → `xhigh`, then
+Fable only under section 2's condition). After two failed rounds on one piece of work the parent stops and tells
+the user. Security stops at Opus `xhigh`, then the user.
 
 ## 4. Gates and the security review
 
-- **Gates:** push, PR, merge, deploy, paid calls, key changes and anything irreversible happen only on the user's
-  word; a push follows a check of the staged diff for secret values. A noted approval holds for this session only.
+- **Gates** are approvals only the user gives: push, PR, merge, deploy, paid calls, key changes and anything
+  irreversible happen only on the user's word; a push follows a check of the staged diff for secret values. A noted
+  approval holds for this session only.
 - **Security or secrets work gets one review,** by `wt-reviewer` (a fresh Opus 5.5 `high` subagent), scoped to the floor files and
   their tests, with the spec and section 6's hardening list. Its prompt carries the no-values rule. Raise it to
   `xhigh` only when the review finds a major issue or no test covers the risky path. Never Codex, Sonnet or Fable.
