@@ -1,8 +1,9 @@
 # Schedule: waves and chains
 
-Detail behind `spawn.md` section "3. Schedule: waves and chains". Harness steps (spawn fields, settings, where
-the level that ran is recorded) are in `harness-omp.md` and `harness-claude-code.md`; this file names the
-step and links there.
+Detail behind `spawn.md` section "3. Schedule: waves and chains". The words row, wave, join, chain and floor
+mean what `spawn.md` `## Terms` says. The parent (the main session the user talks to) builds the schedule.
+Harness steps (spawn fields, settings, where the level that ran is recorded) are in `harness-omp.md` and
+`harness-claude-code.md`; this file names the step and links there.
 
 ## 1. The coupling test
 
@@ -22,7 +23,8 @@ one file. Coupling is transitive: if A is coupled to B and B to C, all three are
 
 - **Coupled through a file, a component, a rename or a refinement: merge** into one row, or order them when
   they must stay separate. Two writers on one file overwrite each other or leave conflicting patches for the
-  integration owner. Separate worktrees do not change this: same-file rows never run in parallel.
+  integration owner (whoever runs builds and the full suite after a wave: the parent unless the plan names a
+  row). Separate worktrees do not change this: same-file rows never run in parallel.
 - **Coupled through a result: order.** The later row gets the earlier one's `#` in `Starts after`.
 - An interface coupling disappears once the contract is written: rows built against it run side by side (3).
 
@@ -55,8 +57,8 @@ into each task. Rows that guess a shared contract each guess differently, and th
 
 - Every row has an `Owns` cell: the files or outputs it alone writes; `—` for gates and read-only rows.
 - One writer per file. Rows that need the same file are coupled (section 1): merge them or order them.
-- Rows skip builds, linters, formatters and test suites that touch shared state. The integration owner (the
-  parent unless the plan names a row) runs them once after the wave. A row runs only its own check.
+- Rows skip builds, linters, formatters and test suites that touch shared state. The integration owner runs
+  them once after the wave. A row runs only its own check.
 - Note: rows of one wave that write in separate worktrees branch from the same commit; the integration owner
   merges them with a dry run and runs the full suite, and the next wave branches from the merged head.
 

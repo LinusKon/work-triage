@@ -2,7 +2,9 @@
 
 Does a triage skill make agent work cheaper without making it worse? Six rounds, 95 measured runs, nine tasks.
 The short answer: **not on small tasks, yes on large builds**, and the skill had to be rebuilt five times to get
-there. This page is the method and the record, including the rounds it lost.
+there. This page has the method, the data and every round, including the rounds the skill lost. The calibration
+benchmark in [`skills/work-triage/references/calibration.md`](../skills/work-triage/references/calibration.md) is
+a separate, earlier body of evidence and is not part of this study.
 
 ## Where it started
 
@@ -18,24 +20,24 @@ everything, which the first round below punished.
 Every run follows the same protocol (`run_study.sh`):
 
 1. **One task, one fresh repository.** The task text is a fixed specification from [`tasks/`](tasks).
-2. **Arms differ by one line.** Every arm is the same model in the same harness (Opus 5.5 in omp 18.20.3, no
-   context files, no installed skills) with the same tools: subagents and the Codex CLI. The skill arm's prompt
-   starts with "Read the work-triage skill at … and follow it"; the baseline's does not. The saved prompts were
-   compared.
+2. **Arms differ by one line.** An arm is one setup under test: the skill or no skill (the baseline). Every arm is
+   the same model in the same harness (Opus 5.5 in omp 18.20.3, no context files, no installed skills) with the
+   same tools: subagents and the Codex CLI (OpenAI's coding agent). The skill arm's prompt starts with "Read the
+   work-triage skill at … and follow it"; the baseline's does not. The saved prompts were compared.
 3. **A hidden acceptance test** ([`hidden-tests/`](hidden-tests)) runs after the session ends. No session saw it.
    Each test was first checked against a reference solution written from the specification alone by a different
    model family, and against planted mutants it has to catch.
-4. **Cost is read from the session files,** for the head session and every subagent, by `collect.py`. Codex work is
+4. **Cost is read from the session files,** for the main session and every subagent, by `collect.py`. Codex work is
    priced at OpenAI's API list prices so that it can be added to Claude dollars; on a subscription it costs
    allowance instead.
 5. **Blind reviews.** A fresh reviewer gets a copy of the result without history, plan or logs, and the
    specification, and does not know the arm (`blind_review.sh`).
 6. **Blind, uniform grading of defects** (rounds 5 and 6). Reviewer labels turned out to be uneven: the same defect
-   was "major" in one review and "minor" in the next. A blind adjudicator therefore lists every distinct defect
-   from all reviews, grades each by one rubric and writes one executable probe per defect
-   ([`adjudication/`](adjudication)); the probes run on every build of both arms.
+   was "major" in one review and "minor" in the next. A blind adjudicator, a fresh reviewer who settles the final
+   list, therefore lists every distinct defect from all reviews, grades each by one rubric and writes one
+   executable probe per defect ([`adjudication/`](adjudication)); the probes run on every build of both arms.
 7. **Bars fixed before the runs,** and every analysis cross-checked by a model of another family, which recomputed
-   the numbers from the raw files and repeatedly made the write-up more modest.
+   the numbers from the raw files.
 
 The rubric: a defect is *major* when the behaviour contradicts an explicit sentence of the specification for an
 input the specification covers, when the command line ends in a traceback or the wrong exit code, or when a
@@ -46,8 +48,8 @@ deliverable is missing; everything else is *minor*.
 | Round | Tasks | Skill | Against | Result (median total cost per run) |
 |---|---|---|---|---|
 | 1 | A–D, small to mid, 3 runs each | 2.1 | Opus `high`, no skill | $1.38 against $0.67: the skill costs twice as much |
-| 2 | A–D again | 2.2 | the same | $0.78 against $0.74: level |
-| 3 | E–G, new, small | 2.3 with a `medium` head | no skill at `high` and at `medium` | $0.50 against $0.77 and **$0.37**: lowering the head alone beat the skill |
+| 2 | A–D again | 2.2 | the same | $0.78 against $0.74: equal |
+| 3 | E–G, new, small | 2.3 with a `medium` main session | no skill at `high` and at `medium` | $0.50 against $0.77 and **$0.37**: lowering the main session's level alone beat the skill |
 | 4 | H, large, 1 run each (pilot) | 2.4 | no skill, free and told to spawn | $4.05 against $6.99 and $6.91 |
 | 5 | H, 5 runs each | 2.5 | Opus `high`, no skill | **$4.11 against $6.06, −32 %, p = 0.0079** |
 | 6 | I, new, large, 5 runs each | 2.6 | Opus `high`, no skill | **$4.58 against $7.76, −41 %, p = 0.0079** |
@@ -57,21 +59,21 @@ Every run of every round passed its hidden test, with and without the skill.
 What each round changed in the skill:
 
 - **After round 1:** stop splitting by default. A six-step plan done by one session cost $0.50; the same plan as
-  Codex and subagent rows cost $2.38, 83 % of it in the head session's briefs, waits and reads.
+  Codex and subagent rows cost $2.38, 83 % of it in the main session's briefs, waits and reads.
 - **After round 2:** the skill text shrank from 22 kB to 7 kB (reading it cost about 15k tokens on every turn),
   and two separate floor reviews became one.
-- **After round 3:** the head stays at `high`. A `medium` head saved more than the skill on small tasks but drew
-  the study's only security findings (two in one of nine runs; reviewer labels were uneven). Delegating a small
-  task to one cheap worker cost more than the head's overhead around it. The skill now does nothing on small work
-  except say so.
+- **After round 3:** the main session stays at `high`. A `medium` main session saved more than the skill on small
+  tasks but drew major review findings in 2 of 9 runs (3 findings, two of them security, both in one run; reviewer
+  labels were uneven). Delegating a small task to one cheap worker cost more than the main session's overhead
+  around it. The skill now does nothing on small work except say so.
 - **After round 4:** omp agent definitions that carry model, level and rules, so that briefs stay short and no
-  worker inherits the head's model.
+  worker inherits the main session's model.
 - **After round 5:** "exactly the spec, not stricter". The blind grading showed that half of the major defects in
   both arms were restrictions nobody had asked for.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="charts/small-tasks-dark.svg">
-  <img src="charts/small-tasks-light.svg" alt="Small tasks: median cost per run without the skill, with it, and without it at a medium head level.">
+  <img src="charts/small-tasks-light.svg" alt="Small tasks: median cost per run without the skill, with it, and without it with the main session at medium.">
 </picture>
 
 ## The two large builds
@@ -92,12 +94,13 @@ line. I was written after skill 2.6 was frozen and was never used to tune it.
 | Total $ per run, sorted | 4.52 · 5.27 · 6.06 · 6.91 · 7.00 | 3.83 · 3.96 · 4.11 · 4.47 · 4.67 | 5.16 · 7.01 · 7.76 · 7.87 · 8.15 | 3.84 · 4.09 · 4.58 · 4.74 · 5.52 |
 | Median total $ | 6.06 | 4.11 | 7.76 | 4.58 |
 | Median Claude $ only | 4.76 | 3.83 | 5.92 | 4.58 |
-| Median head-session $ | 2.34 | 2.22 | 2.61 | 1.58 |
+| Median main-session $ | 2.34 | 2.22 | 2.61 | 1.58 |
 | Median wall time | 12.0 min | 14.5 min | 12.6 min | 17.6 min |
 | Hidden test | 5/5 | 5/5 | 5/5 | 5/5 |
 
 **The bar, fixed in advance for both builds:** median total at least 25 % lower, and an exact one-sided rank-sum
-permutation test on the ten totals with p < 0.05. Both builds: rank sum 16, 2 of 252 permutations, p = 0.0079.
+permutation test on the ten totals with p < 0.05. Both builds: rank sum 16, 2 of 252 permutations (every way to
+split ten totals into two groups of five), p = 0.0079.
 
 **What the arms did.** Without the skill every run spawned on its own: four to seven Opus subagents at mixed
 levels, and in nine of ten runs one to three reviews on the most expensive Codex model. With the skill, eight of ten
@@ -124,7 +127,7 @@ modules to the cheap Codex model in batches instead, at the same cost.
 
 - For build I the quality rule was fixed before the runs (sum of majors not above the baseline's) and met. For
   build H the uniform grading was done after the fact, when a cross-check showed that the declared rule had leaned
-  on uneven reviewer labels; under it the arms are level.
+  on uneven reviewer labels; under it the arms are equal.
 - Most "major" kinds rest on a strict reading of the specification that both arms share (a loader that accepts
   slightly more than specified, for example). The adjudicator marked those; [`data/defect-kinds.csv`](data/defect-kinds.csv)
   lists every kind with the number of runs per arm that have it.
@@ -135,8 +138,10 @@ modules to the cheap Codex model in batches instead, at the same cost.
 ## Limits
 
 - Two large builds, both Python, both specified in detail by the skill's authors, each small enough that one
-  session could still finish it alone in ten to twenty minutes.
-- One harness and one head model. Other harnesses spawn differently; the shipped agents are omp definitions.
+  session could still finish it alone in ten to twenty minutes. They were orchestrated because each is above the
+  skill's size threshold (more than about ten files), and the comparison is with a baseline that also chose to
+  spawn subagents.
+- One harness and one main-session model. Other harnesses spawn differently; the shipped agents are omp definitions.
 - Five runs per arm. The cost difference is clear at that size; defect counts are not precise at that size.
 - Codex at list prices. In Claude dollars alone the medians differ by 20 % and 23 %.
 - The skill is slower.
@@ -148,7 +153,7 @@ modules to the cheap Codex model in batches instead, at the same cost.
 
 | Path | Content |
 |---|---|
-| [`data/runs.csv`](data/runs.csv) | One row per run: round, task, arm, skill version, total, Claude and Codex dollars, head-session dollars, tokens, wall time, spawns, hidden-test result, Sonnet and Opus dollars |
+| [`data/runs.csv`](data/runs.csv) | One row per run: round, task, arm, skill version, total, Claude and Codex dollars, main-session dollars, tokens, wall time, spawns, hidden-test result, Sonnet and Opus dollars |
 | [`data/defects.csv`](data/defects.csv), [`data/defect-kinds.csv`](data/defect-kinds.csv) | Defects per run and per kind for the two large builds |
 | [`charts/`](charts) | Every chart, drawn by `charts.py` from the CSV files, in a light and a dark variant |
 | [`tasks/`](tasks) | The nine specifications; `F.seed/` is the seeded repository of task F |

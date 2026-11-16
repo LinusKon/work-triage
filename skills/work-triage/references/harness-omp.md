@@ -1,7 +1,27 @@
 # Running a triaged plan in omp
 
-Verified against omp 18.20.3 on 2026-11-16. omp (oh-my-pi) also runs inside the Tern app, which adds no
-agent terms of its own. Read this before the first spawn; the rules themselves are in `SKILL.md` and `spawn.md`.
+Verified against omp 18.20.3 (oh-my-pi) on 2026-11-16. Read this before the first spawn. The rules themselves are
+in `SKILL.md` and `spawn.md`; this file covers how omp carries them out. The parent is the main session the user
+talks to; omp calls the top session `Main`.
+
+## The shipped agents
+
+The skill ships three agent definitions in its `agents/` folder:
+
+| Agent | Model and level | Rows |
+|---|---|---|
+| `wt-worker` | Sonnet 5.5 `medium` | spec'd modules, CLIs, tests and docs |
+| `wt-worker-hard` | Sonnet 5.5 `high` | the same, dense with edge cases or with an approach to choose |
+| `wt-reviewer` | Opus 5.5 `high` | the review at the join and the security review; it does not edit |
+
+- Install: copy them into the project's `.omp/agents/` (`cp <skill>/agents/*.md .omp/agents/`) or into the
+  user-level `~/.omp/agent/agents/`. They are installed when the task tool's description lists `wt-worker`
+  among its agents.
+- Select one with the task item's `agent` field and leave `model` out. The file's frontmatter sets `model` and
+  `thinking-level`, so the row runs on that model and level. These rows pass no `model`, so the preflight below
+  does not apply to them.
+- Rows no agent fits name a per-call `model` with a level: Opus 5.5 `medium` for taste (copy, UI polish, image
+  and video prompts), Opus 5.5 `high` for floors. Never `effort`.
 
 ## Terms
 
@@ -23,8 +43,9 @@ One wave is one `task` tool call (`omp://tools/task.md`): the shared `context` f
 - `context`: the contracts the parent settled before the wave (terms, interfaces, file names, formats).
   Children do not inherit the conversation; they get the workspace, skills, rules and `local://`.
 - `name`: CamelCase, at most 32 characters, unique; it becomes the agent's id for messages.
-- `agent`: on each item, never at the top level; omit it for the default `task` type.
-- `model`: the row's model selector, always with a level (next section).
+- `agent`: on each item, never at the top level: a shipped agent for worker and reviewer rows; omit it for the
+  default `task` type.
+- `model`: only on rows no shipped agent fits; the row's model selector, always with a level (next section).
 - `task`: self-contained: the row's `Owns`, the change, the tools and sources to use, the acceptance check,
   and the output as a path plus a short summary. It ends with a stop condition: the smallest change that
   passes the acceptance check, run that check, stop when it passes. Never "be certain", "be thorough" or
@@ -43,9 +64,11 @@ One wave is one `task` tool call (`omp://tools/task.md`): the shared `context` f
 - Write `provider/model-id:level`, e.g. `anthropic/claude-sonnet-5-5:medium`. It is matched literally: no
   alias, glob or partial id. The level is clamped to what the model supports and to `task.maxEffort`
   (`omp://task-agent-discovery.md`).
-- Without `model` the row runs on the parent's model and level (the `task` role falls back to the session):
-  a forgotten selector runs a Sonnet row on the orchestrator. The task tool marks this model `(default)`.
-- A per-call model gets no retry fallback, context promotion or prewalk: it fails rather than switch models.
+- Without `model` or a shipped agent, the row runs on the parent's model and level (the `task` role falls back
+  to the session): a forgotten selector runs a Sonnet row at the parent's price. The task tool marks this model
+  `(default)`.
+- A per-call model gets none of omp's automatic recovery (retry fallback, context promotion, prewalk): it fails
+  rather than switch models.
 - Never use the item field `effort`: it is relative (`lo`/`med`/`hi` map to the model's lowest, middle and
   highest level, so `hi` is `max` before the cap) and overrides the agent's selector
   (`omp://task-agent-discovery.md`). `task.enableEffort: false`, the default, removes it
@@ -81,13 +104,10 @@ After the first spawn of a wave, compare the requested selector with what ran, a
 
 Set at start by `defaultThinkingLevel` or `--thinking` (`omp://settings.md`, `omp://cli-reference.md`). Only
 the user changes it: `Shift+Tab` cycles the level (`omp://keybindings.md`), or `/effort` (omp's docs describe
-`/effort` only for a focused subagent, `omp://agent-hub.md`). No tool lets an agent raise its own level, so
-escalation (`spawn.md`, "Orchestrator") is one `anthropic/claude-fable-5-2:high` subagent with the question
-and the artefact paths, or a request to the user. Fresh orchestrator session (`omp://cli-reference.md`):
-
-```sh
-omp --model "anthropic/claude-fable-5-2" --thinking=medium "Read <handoff file> and continue there."
-```
+`/effort` only for a focused subagent, `omp://agent-hub.md`). No tool lets an agent raise its own level. When a
+question needs more than the parent's level, the parent spawns one `anthropic/claude-opus-5-5:high` subagent with
+the question and the artefact paths (`xhigh` when the question spans systems), or asks the user to raise the
+session (`spawn.md`, "Orchestrator").
 
 ## Waiting and follow-ups
 
@@ -100,7 +120,8 @@ omp --model "anthropic/claude-fable-5-2" --thinking=medium "Read <handoff file> 
 
 ## Codex rows
 
-A Codex row runs `<skill>/scripts/codex_row.sh implement --model gpt-6.1-sol --level medium --prompt <file>
+Codex is optional: a wave has Codex rows only when the user works with Codex or asks for it (`SKILL.md`). A Codex
+row runs `<skill>/scripts/codex_row.sh implement --model gpt-6.1-sol --level medium --prompt <file>
 --out <file>` (or `review`, `check`), `<skill>` being the absolute path of the folder SKILL.md was loaded from
 (`omp skill list --json`). Prompts and models: `codex-implementation.md`, `codex-review.md`, `codex-computer-use.md`.
 - Start it with the bash tool as `async: true` (needs `async.enabled`, default on, `omp://settings.md`) and

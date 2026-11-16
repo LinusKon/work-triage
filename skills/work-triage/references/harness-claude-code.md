@@ -2,8 +2,9 @@
 
 Mechanics verified 2026-11-13 against Claude Code 2.1.323 and its docs (`model-config`, `sub-agents`,
 `skills`, `prompt-caching`). Prices, levels and sources: [facts.md](facts.md). Claude Code's "effort level"
-is what the skill calls the level. The skill's frontmatter sets no `effort`, so the session's own level
-applies while triaging. In omp read [harness-omp.md](harness-omp.md) instead.
+is what the skill calls the level. The parent is the main session the user talks to; Claude Code calls it the
+main conversation. The skill's frontmatter sets no `effort`, so the parent's own level applies while triaging. In
+omp read [harness-omp.md](harness-omp.md) instead.
 
 ## What Claude can and cannot switch
 
@@ -14,12 +15,12 @@ applies while triaging. In omp read [harness-omp.md](harness-omp.md) instead.
   session; a typed level becomes the saved default). Never log a row at a level nobody set.
 - `ultrathink` typed by the user in the terminal can raise one turn to `xhigh`; inside a subagent prompt
   it is only a hint.
-- In a swarm run, the session that drafted the plan may not match the orchestrator row. If it does,
-  continue. If not, write plan and triage to `docs/plan.md` and give the user the command for the
-  execution session:
+- The parent keeps its model and level for the whole run (Opus 5.5 `high` by default) and asks for no switch.
+  When a run continues in a fresh session (after a safety fallback, or when the conversation is long), write
+  plan and triage to `docs/plan.md` and give the user the command:
   `claude --model <model> --effort <level> "Read docs/plan.md and start with row 1."`
-  A fresh session costs less than switching a long conversation: a model switch re-reads the whole
-  history uncached, and moving down from Fable drops its thinking.
+  A fresh session costs less than switching a long conversation: a model switch re-reads the whole history
+  uncached.
 
 ## Mechanics (2.1.323)
 
@@ -38,7 +39,8 @@ skill frontmatter > level picked in the session > `--effort` > settings > model 
 
 Subagent model precedence: Agent-tool `model` > definition `model:` > `CLAUDE_CODE_SUBAGENT_MODEL` > main
 session model. A subagent on a different model than the session does not get the session's level ("On
-another model, that level doesn't apply"), so always pass `effort`.
+another model, that level doesn't apply"), so always pass `effort`. Claude Code's `effort` is the level itself;
+the rule against `effort` in `SKILL.md` concerns omp's relative item field of that name.
 
 In Claude Code an alias of the parent's family runs the parent's version (`opus` under a parent on Opus 4.8
 runs Opus 4.8); after a safety fallback, read the version in `/tasks` before the next wave [INFERENCE:
@@ -59,12 +61,26 @@ edits on Sonnet.
   passes the acceptance check, run that check, stop when it passes. Never "be certain", "be thorough" or
   "compare several approaches": raise the level instead ("max certainty" wording cost 4.13x output tokens
   on Sonnet 5 in Claude Code, "think hard" only 1.25–1.30x; one preregistered study).
-- Subagents start with an empty cache. Batch tiny rows with their neighbours, or run them inline on the
-  orchestrator.
+- Subagents start with an empty cache. Batch tiny rows with their neighbours, or run them inline in the
+  parent.
 - Subagents inherit the session's MCP tools, paid ones included, but cannot ask the user anything. Paid
   calls, saves in a web dashboard and other gated actions run in the main session.
 - Whether a browser integration reaches a subagent is not established: signed-in browser work runs in the
   main session.
+
+## The shipped agents in Claude Code
+
+The skill's `agents/` folder holds omp definitions (`wt-worker`, `wt-worker-hard`, `wt-reviewer`). In Claude
+Code, spawn the same three roles as subagents through the Agent tool and name model and effort on every call:
+
+| Role | Agent tool call |
+|---|---|
+| `wt-worker` | `model: "sonnet"`, `effort: "medium"` |
+| `wt-worker-hard` | `model: "sonnet"`, `effort: "high"` |
+| `wt-reviewer` | `model: "opus"`, `effort: "high"`; the brief says it reviews and does not edit |
+
+The omp files also carry the rules of `SKILL.md` sections 5 and 6. A Claude Code brief has no agent file
+behind it, so it names those sections or carries the rules the row needs.
 
 ## Safety fallback
 

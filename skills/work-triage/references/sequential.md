@@ -2,8 +2,9 @@
 
 Read this when the plan holds a chain. Detection in short is in `spawn.md` `## Chains`; waves and ownership in
 `references/schedule.md`; review points in `references/verify.md`. This profile wins over the swarm count: a
-plan whose backbone is a chain the parent must run (paid or gated links) is no swarm run, whatever its waves.
-The parent keeps its model and runs the links; side rows are subagent or Codex rows.
+plan whose backbone is a chain the parent (the main session the user talks to) must run, because its links are
+paid or gated, is no swarm run, whatever its waves. The parent keeps its model and level and runs the links;
+side rows are subagent rows, or Codex rows when the user works with Codex.
 
 ## Recognise a chain
 
@@ -78,25 +79,25 @@ of the link they run beside. Paid links are `Run as` `parent` and carry the full
 Two scenes, five beats. Each beat's clip starts from the end frame of the previous beat's approved take.
 Scene 1: beats 1-2. Scene 2: beats 3-5. Beat 4 has a speed ramp.
 
-Orchestrator: Opus 5.5 · medium (chain profile, not a swarm run; the parent runs every paid link).
+Orchestrator: Opus 5.5 · high (sequential profile, not a swarm run; the parent runs every paid link).
 Reviews: 0. Fix rounds: 1.
 
 | # | Row | Model | Level | Run as | Starts after | Owns | Check | Escalate if |
 |---|---|---|---|---|---|---|---|---|
-| 1 | Shot list and prompts for all five beats, beat constraints in the prompts | Opus 5.5 | medium | parent | — | `film/shots.md` | the user reads it | — |
-| 2 | Script: extract a clip's last frame and check its size, with a selftest | gpt-6.1-sol | medium | Codex | — | `tools/last_frame.py`, its test | its selftest | fails twice → gpt-6-astra high |
-| 3 | Script: join clips, with a selftest on dummy clips | gpt-6.1-sol | medium | Codex | — | `tools/join.py`, its test | its selftest | fails twice → gpt-6-astra high |
-| 4 | Sound references for the five beats | Sonnet 5.5 | medium | subagent | 1 | `film/sound/` | a link per beat | — |
-| 5 | Beat 1 (scene 1): generate (paid) | Opus 5.5 | medium | parent | 1 | `film/b1/` | user approves cost and inputs before the call; user accepts the result after | three takes rejected → rewrite the prompt |
+| 1 | Shot list and prompts for all five beats, beat constraints in the prompts | Opus 5.5 | medium | subagent | — | `film/shots.md` | the user reads it | — |
+| 2 | Script: extract a clip's last frame and check its size, with a selftest (`wt-worker`) | Sonnet 5.5 | medium | subagent | — | `tools/last_frame.py`, its test | its selftest | fails again → parent fix or `wt-worker-hard` |
+| 3 | Script: join clips, with a selftest on dummy clips (`wt-worker`) | Sonnet 5.5 | medium | subagent | — | `tools/join.py`, its test | its selftest | fails again → parent fix or `wt-worker-hard` |
+| 4 | Sound references for the five beats (`wt-worker`) | Sonnet 5.5 | medium | subagent | 1 | `film/sound/` | a link per beat | — |
+| 5 | Beat 1 (scene 1): generate (paid) | Opus 5.5 | high | parent | 1 | `film/b1/` | user approves cost and inputs before the call; user accepts the result after | three takes rejected → rewrite the prompt |
 | 6 | Check beat 1 against the shot list | Sonnet 5.5 | medium | subagent | 2, 5 | `film/checks/b1.md` | report with frame size, length, sound | — |
-| 7 | Beat 2 (scene 1) from beat 1's end frame (paid) | Opus 5.5 | medium | parent | 2, 5 | `film/b2/` | user approves cost and inputs before the call; user accepts the result after | three takes rejected → rewrite the prompt |
+| 7 | Beat 2 (scene 1) from beat 1's end frame (paid) | Opus 5.5 | high | parent | 2, 5 | `film/b2/` | user approves cost and inputs before the call; user accepts the result after | three takes rejected → rewrite the prompt |
 | 8 | Check beat 2 against the shot list | Sonnet 5.5 | medium | subagent | 7 | `film/checks/b2.md` | report | — |
-| 9 | Beat 3 (scene 2) from beat 2's end frame (paid) | Opus 5.5 | medium | parent | 7 | `film/b3/` | user approves cost and inputs before the call; user accepts the result after | three takes rejected → rewrite the prompt |
+| 9 | Beat 3 (scene 2) from beat 2's end frame (paid) | Opus 5.5 | high | parent | 7 | `film/b3/` | user approves cost and inputs before the call; user accepts the result after | three takes rejected → rewrite the prompt |
 | 10 | Check beat 3 against the shot list | Sonnet 5.5 | medium | subagent | 9 | `film/checks/b3.md` | report | — |
-| 11 | Beat 4 (scene 2) from beat 3's end frame, speed ramp (paid) | Opus 5.5 | medium | parent | 9 | `film/b4/` | user approves cost and inputs before the call; user accepts the result (take and ramp) after | three takes rejected → rewrite the prompt |
+| 11 | Beat 4 (scene 2) from beat 3's end frame, speed ramp (paid) | Opus 5.5 | high | parent | 9 | `film/b4/` | user approves cost and inputs before the call; user accepts the result (take and ramp) after | three takes rejected → rewrite the prompt |
 | 12 | Check beat 4 against the shot list | Sonnet 5.5 | medium | subagent | 11 | `film/checks/b4.md` | report | — |
-| 13 | Beat 5 (scene 2) from beat 4's end frame (paid) | Opus 5.5 | medium | parent | 11 | `film/b5/` | user approves cost and inputs before the call; user accepts the result after | three takes rejected → rewrite the prompt |
-| 14 | Join the approved clips with row 3's script, check beat 5 and the cut | Opus 5.5 | medium | parent | 3, 4, 12, 13 | `film/cut/` | the user watches the cut | — |
+| 13 | Beat 5 (scene 2) from beat 4's end frame (paid) | Opus 5.5 | high | parent | 11 | `film/b5/` | user approves cost and inputs before the call; user accepts the result after | three takes rejected → rewrite the prompt |
+| 14 | Join the approved clips with row 3's script, check beat 5 and the cut | Opus 5.5 | high | parent | 3, 4, 12, 13 | `film/cut/` | the user watches the cut | — |
 
 Waves: {1, 2, 3}, {4, 5}, {6, 7}, {8, 9}, {10, 11}, {12, 13}, {14}. Six of them hold two or more rows, yet the
 plan is no swarm run: the links 5, 7, 9, 11, 13 form the chain's path and never share a wave; each check runs

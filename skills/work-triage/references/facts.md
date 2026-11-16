@@ -4,7 +4,6 @@ Everything here is from Anthropic's own pages, fetched 2026-11-13 with Claude Co
 marked independent cross-check. Models and prices change: re-check the pages at the bottom before
 trusting a number that is more than a few weeks old. Claude Code mechanics are in
 [harness-claude-code.md](harness-claude-code.md), omp's in [harness-omp.md](harness-omp.md).
-The full research notes are kept with the skill's source repository.
 
 ## The three models
 
@@ -45,7 +44,7 @@ Effort levels are calibrated per model: `high` on Sonnet is not the same amount 
 | Opus 5.5 on a SWE-bench Pro subset | `low` 87.4 % / $0.11 · `medium` 92.8 % / $0.21 · `high` 95.3 % / $0.29 · `xhigh` 96.7 % / $0.74 per task |
 | Opus 5.5 `low` vs Sonnet 5.5 default | about the same share solved, Opus ~7 % more per solved task (one coding benchmark; on defect search Opus `low` scored 0.489 against Sonnet's 0.760) |
 | Sonnet 5.5 `medium` vs its `high` | ~7 points lower on SWE-bench Pro; 62.7 % vs 77.8 % on an internal agentic-coding benchmark |
-| Opus 5.5 `xhigh` vs Fable 5.2 `high` (SWE-bench Pro) | level (96.5 % vs 96.3 %), Opus at a little over half the cost |
+| Opus 5.5 `xhigh` vs Fable 5.2 `high` (SWE-bench Pro) | equal (96.5 % vs 96.3 %), Opus at a little over half the cost |
 | FrontierCode 2.0 (frontier-hard) | Fable 5.2 `high` ≈ Opus 5.5 `max` for about half the cost per task |
 | Defect search | Opus 5.5 `low` 34 points below `medium`; Fable 5.2 `low` only 4.3 below `high` |
 | DeepResearch Bench II, default effort | Fable 5.2 cost 4.3× Sonnet 5.5 for no measurable gain, 2.9× Opus 5.5 for 1.9 points less |
@@ -65,8 +64,8 @@ at each price or index change. So Sonnet above `high` is dominated by Opus `high
 Opus's system card shows its FrontierCode v1.1 score dipping above `medium` and mostly recovering at
 `max`, because the grader penalises out-of-scope edits (bigger diffs). Test writing is not reserved for
 Opus: only tests that are the sole check of a security row share that row's floor. No published evidence
-exists on plan review by model, so the skill keeps plan, design and final reviews on Opus or the
-cross-family reviewer its review rules name.
+exists on plan review by model, so the skill keeps plan and design reviews and the review at the join on
+Opus 5.5 `high` (`wt-reviewer`).
 
 ## Limits, fallbacks, costs that are easy to miss
 

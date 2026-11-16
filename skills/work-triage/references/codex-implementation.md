@@ -1,10 +1,12 @@
 # Codex implementation
 
-Rows come here when the triage sets `Run as` to `Codex` for implementation: bounded or bulk code to a spec
-with a check that stands alone (tests, a selftest, a typecheck): `gpt-6.1-sol` `medium`, `high` with edge
-cases (routing: `spawn.md`, "2. Decide: model and level"). A failed check: first failure, same model one level
-up (`medium` → `high`); second failure, `gpt-6-astra` `high`. The cell "fails twice → gpt-6-astra high" is
-the short form of that path.
+Codex is optional. Implementation goes to Codex only when the user works with Codex or asks for it; otherwise
+spec'd code goes to `wt-worker` or `wt-worker-hard` (`SKILL.md` section 2). In the study both routes cost the same.
+A Codex row is code to a spec with a check that stands alone (tests, a selftest, a typecheck): `gpt-6.1-sol`
+`medium`, `high` for dense edge cases. Always pass model and level.
+A failed check goes back to Codex once. If it fails again, the parent (the main session the user talks to) fixes
+it when the fix is small; otherwise the row moves one rung up (`medium` → `high`, then Opus 5.5 `high`). After two
+failed rounds on one row the parent stops and tells the user.
 Never here: security, secrets, production, paid runs, gates; signed-in web; taste, prompts for image and
 video models, plans and designs; `gpt-6-luna` on security or edge-case work.
 
@@ -75,12 +77,12 @@ Constraints:
 2. After the run, read `git diff --stat` and the diff of the owned files, then run the row's check
    yourself. This is the acceptance before rows that build on it start; it is not a review row. Report what
    changed and the check's real output; a failed check is reported as failed.
-3. Reviews come at the join, after the consumers, and cover the merged result (`verify.md`).
+3. The one review comes at the join, after the consumers: `wt-reviewer` on the merged result (`verify.md`).
 
 ## Parallel Codex rows
 
 Codex rows follow the ownership rule of every row (`schedule.md`): rows that touch the same file are merged
 or ordered, never run in parallel, whatever the worktree.
 
-If `codex` is missing or will not start, report the error; the row then runs on Claude at the rung `spawn.md`
-gives it.
+If `codex` is missing or will not start, report the error; the row then runs on `wt-worker`, or on
+`wt-worker-hard` for dense edge cases.
