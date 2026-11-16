@@ -94,3 +94,6 @@ round,task,arm,rep,skill_version,head_level,total_usd,claude_usd,codex_usd,paren
 6,I,skill26,3,2.6.0,high,4.5754,4.5754,0.0000,1.5999,5114597,0,1104,6,0,1,28,1.4944,3.0810,
 6,I,skill26,4,2.6.0,high,3.8433,3.8433,0.0000,1.2692,4382842,0,884,6,0,1,28,1.5510,2.2923,
 6,I,skill26,5,2.6.0,high,4.7445,4.7445,0.0000,1.5790,5774190,0,1056,5,0,1,28,1.7560,2.9885,
+6,I,skill261,1,2.6.1,high,3.9931,3.9931,0.0000,1.5152,4503219,0,888,5,0,1,28,1.3529,2.6402,"control run after the wording-only release 2.6.1, no reviews"
+6,I,skill261,2,2.6.1,high,4.3805,4.3805,0.0000,1.7551,5027065,0,885,6,0,1,28,1.4620,2.9185,"control run after the wording-only release 2.6.1, no reviews"
+6,I,skill261,3,2.6.1,high,3.6444,3.6444,0.0000,1.1673,3580625,0,756,5,0,1,28,1.5538,2.0906,"control run after the wording-only release 2.6.1, no reviews"

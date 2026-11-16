@@ -1,6 +1,7 @@
 # The study behind work-triage
 
-Does a triage skill make agent work cheaper without making it worse? Six rounds, 95 measured runs, nine tasks.
+Does a triage skill make agent work cheaper without making it worse? Six rounds, 95 measured runs, nine tasks
+(`data/runs.csv` holds 98 rows: three more are control runs of the final wording).
 The short answer: **not on small tasks, yes on large builds**, and the skill had to be rebuilt five times to get
 there. This page has the method, the data and every round, including the rounds the skill lost. The calibration
 benchmark in [`skills/work-triage/references/calibration.md`](../skills/work-triage/references/calibration.md) is
@@ -147,7 +148,10 @@ modules to the cheap Codex model in batches instead, at the same cost.
 - The skill is slower.
 - Build H's main result belongs to skill 2.5. Three runs of 2.6 on H cost $3.88, $4.01 and $4.24 and passed the
   hidden test; their defects were not graded.
-- The study cost about $241 in model usage, which is why the cells are small.
+- The published skill is 2.6.1, which changes wording only (the three agent files are identical to 2.6.0). Three
+  control runs of 2.6.1 on build I cost $3.64, $3.99 and $4.38 and passed the hidden test; their defects were not
+  graded.
+- The study cost about $253 in model usage, which is why the cells are small.
 
 ## Files
 
