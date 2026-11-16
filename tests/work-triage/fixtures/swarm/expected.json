@@ -1,0 +1,244 @@
+{
+  "orchestrator": "Opus 5.5:high",
+  "reviews": 2,
+  "review_points": [
+    10,
+    11
+  ],
+  "fix_rounds": 1,
+  "steps": {
+    "1": {
+      "title": "Decide the plugin interface and write it down",
+      "accepted": [
+        "Opus 5.5:high",
+        "parent"
+      ],
+      "floor": true,
+      "floor_kind": "interface",
+      "codex_first": false,
+      "required_dependencies": [],
+      "forbidden_dependencies": [],
+      "optional_dependencies": [],
+      "chain": null,
+      "chain_predecessor": null,
+      "never": [],
+      "floor_minimum": "Opus 5.5:high"
+    },
+    "2": {
+      "title": "Implement the CSV format plugin, with its own tests",
+      "accepted": [
+        "gpt-6.1-sol:medium",
+        "Sonnet 5.5:high"
+      ],
+      "floor": false,
+      "floor_kind": null,
+      "codex_first": true,
+      "required_dependencies": [
+        1
+      ],
+      "forbidden_dependencies": [],
+      "optional_dependencies": [],
+      "chain": null,
+      "chain_predecessor": null,
+      "never": []
+    },
+    "3": {
+      "title": "Implement the JSON format plugin, with its own tests",
+      "accepted": [
+        "gpt-6.1-sol:medium",
+        "Sonnet 5.5:high"
+      ],
+      "floor": false,
+      "floor_kind": null,
+      "codex_first": true,
+      "required_dependencies": [
+        1
+      ],
+      "forbidden_dependencies": [],
+      "optional_dependencies": [],
+      "chain": null,
+      "chain_predecessor": null,
+      "never": []
+    },
+    "4": {
+      "title": "Implement the YAML format plugin, with its own tests",
+      "accepted": [
+        "gpt-6.1-sol:medium",
+        "Sonnet 5.5:high"
+      ],
+      "floor": false,
+      "floor_kind": null,
+      "codex_first": true,
+      "required_dependencies": [
+        1
+      ],
+      "forbidden_dependencies": [],
+      "optional_dependencies": [],
+      "chain": null,
+      "chain_predecessor": null,
+      "never": []
+    },
+    "5": {
+      "title": "Implement the XML format plugin, with its own tests",
+      "accepted": [
+        "gpt-6.1-sol:medium",
+        "Sonnet 5.5:high"
+      ],
+      "floor": false,
+      "floor_kind": null,
+      "codex_first": true,
+      "required_dependencies": [
+        1
+      ],
+      "forbidden_dependencies": [],
+      "optional_dependencies": [],
+      "chain": null,
+      "chain_predecessor": null,
+      "never": []
+    },
+    "6": {
+      "title": "Implement the Markdown format plugin, with its own tests",
+      "accepted": [
+        "gpt-6.1-sol:medium",
+        "Sonnet 5.5:high"
+      ],
+      "floor": false,
+      "floor_kind": null,
+      "codex_first": true,
+      "required_dependencies": [
+        1
+      ],
+      "forbidden_dependencies": [],
+      "optional_dependencies": [],
+      "chain": null,
+      "chain_predecessor": null,
+      "never": []
+    },
+    "7": {
+      "title": "Implement the HTML format plugin, with its own tests",
+      "accepted": [
+        "gpt-6.1-sol:medium",
+        "Sonnet 5.5:high"
+      ],
+      "floor": false,
+      "floor_kind": null,
+      "codex_first": true,
+      "required_dependencies": [
+        1
+      ],
+      "forbidden_dependencies": [],
+      "optional_dependencies": [],
+      "chain": null,
+      "chain_predecessor": null,
+      "never": []
+    },
+    "8": {
+      "title": "Write a reference page per plugin from the docstrings",
+      "accepted": [
+        "Sonnet 5.5:medium"
+      ],
+      "floor": false,
+      "floor_kind": null,
+      "codex_first": false,
+      "required_dependencies": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "forbidden_dependencies": [],
+      "optional_dependencies": [],
+      "chain": null,
+      "chain_predecessor": null,
+      "never": []
+    },
+    "9": {
+      "title": "Write the README section with examples for users",
+      "accepted": [
+        "Opus 5.5:medium"
+      ],
+      "floor": false,
+      "floor_kind": null,
+      "codex_first": false,
+      "required_dependencies": [
+        1
+      ],
+      "forbidden_dependencies": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "optional_dependencies": [],
+      "chain": null,
+      "chain_predecessor": null,
+      "never": []
+    },
+    "10": {
+      "title": "Review the merged plugins against the interface and run the full test suite",
+      "accepted": [
+        "Opus 5.5:high",
+        "gpt-6-astra:high"
+      ],
+      "floor": false,
+      "floor_kind": null,
+      "codex_first": false,
+      "required_dependencies": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "forbidden_dependencies": [],
+      "optional_dependencies": [],
+      "chain": null,
+      "chain_predecessor": null,
+      "never": []
+    },
+    "11": {
+      "title": "Review the whole change",
+      "accepted": [
+        "gpt-6-astra:high",
+        "Opus 5.5:high"
+      ],
+      "floor": false,
+      "floor_kind": null,
+      "codex_first": false,
+      "required_dependencies": [
+        8,
+        9,
+        10
+      ],
+      "forbidden_dependencies": [],
+      "optional_dependencies": [],
+      "chain": null,
+      "chain_predecessor": null,
+      "never": []
+    },
+    "12": {
+      "title": "Push and open the pull request",
+      "accepted": [
+        "user"
+      ],
+      "floor": false,
+      "floor_kind": null,
+      "codex_first": false,
+      "required_dependencies": [
+        11
+      ],
+      "forbidden_dependencies": [],
+      "optional_dependencies": [],
+      "chain": null,
+      "chain_predecessor": null,
+      "never": []
+    }
+  },
+  "name": "swarm",
+  "schema_version": 2
+}

@@ -1,0 +1,14 @@
+{
+  "name": "work-triage",
+  "description": "The work-triage skill as a Claude Code plugin.",
+  "owner": {
+    "name": "work-triage contributors"
+  },
+  "plugins": [
+    {
+      "name": "work-triage",
+      "source": "./",
+      "description": "Decides model and level for each piece of agent work, schedules waves and chains, and places reviews and gates."
+    }
+  ]
+}

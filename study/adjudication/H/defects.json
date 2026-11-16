@@ -1,0 +1,218 @@
+[
+  {
+    "id": "D01",
+    "title": "filter_range raises OpError when min > max instead of keeping no rows",
+    "severity": "MAJOR",
+    "spec_quote": "`filter_range(field, min=None, max=None)`: keep rows whose numeric value lies within the inclusive bounds; at least one bound is required.",
+    "reviews": ["r50e9fd31", "r404decef", "rdbaabc49", "r3f3f3450"],
+    "py_newer_only": false,
+    "probe_note": "filter_range([{a:1},{a:3}], field='a', min=5, max=1) must return []; anything else is DEFECT. Severity rationale: well-typed parameters, at least one bound given; the op sentence fixes the result (no row lies within) and the only parameter error it names is a missing bound."
+  },
+  {
+    "id": "D02",
+    "title": "Pipeline error prefix shows '?' instead of the given op when 'op' is not a string",
+    "severity": "MINOR",
+    "spec_quote": "a step is a dict `{\"op\": <name>, ...params}`; a failing step raises `OpError` whose message starts with `step <i> (<op>): `. Spec is silent on a non-string op (outside the defined step shape).",
+    "reviews": ["r50e9fd31"],
+    "py_newer_only": false,
+    "probe_note": "run_pipeline([], [{'op': 5}]) must raise OpError whose message starts with 'step 1 (5): '."
+  },
+  {
+    "id": "D03",
+    "title": "Field-list parameters reject a repeated field name (drop, concat, ...)",
+    "severity": "MAJOR",
+    "spec_quote": "`drop(fields)`: remove `fields`; a field a row lacks is ignored. / `concat(fields, into, sep=\"\")`: join the string values of `fields` with `sep` into the new field `into`; a non-string value or an existing `into` raises `OpError`.",
+    "reviews": ["r404decef", "refe3759c", "r67177e05", "rdbaabc49", "r3f3f3450"],
+    "py_newer_only": false,
+    "probe_note": "drop([{a:1,b:2}], fields=['a','a']) must give [{b:2}] and concat([{a:'x'}], fields=['a','a'], into='b', sep='-') must give [{a:'x', b:'x-x'}]. A list of names with a repeat is the right type and the op sentences fix the result."
+  },
+  {
+    "id": "D04",
+    "title": "Field-list parameters reject an empty list (select, drop, concat, group_count)",
+    "severity": "MAJOR",
+    "spec_quote": "`select(fields)`: keep only `fields` (a list of names), in that order. / `drop(fields)`: remove `fields` / `concat(fields, into, sep=\"\")`: join the string values of `fields` with `sep` into the new field `into`; a non-string value or an existing `into` raises `OpError`. / `group_count(by, into=\"count\")`: one row per distinct combination of the fields `by`",
+    "reviews": ["rfd0bb5d8", "rbe062d62", "rdbaabc49", "r3f3f3450"],
+    "py_newer_only": false,
+    "probe_note": "With fields=[] / by=[] on two rows: select -> [{},{}], drop -> unchanged, concat into 'c' -> c == '' on each row, group_count -> [{count: 2}]. Any exception or different result is DEFECT."
+  },
+  {
+    "id": "D05",
+    "title": "rename rejects an empty mapping",
+    "severity": "MAJOR",
+    "spec_quote": "`rename(mapping)`: `{old: new}`; the row keeps its field order; a `new` that equals another existing field of the row raises `OpError`.",
+    "reviews": ["r3f3f3450"],
+    "py_newer_only": false,
+    "probe_note": "rename([{a:1}], mapping={}) must return [{a:1}]. An empty dict is the right type; the op sentence fixes the result (nothing renamed)."
+  },
+  {
+    "id": "D06",
+    "title": "rename allows a new name equal to an existing field that is itself renamed (swap/chain)",
+    "severity": "MAJOR",
+    "spec_quote": "a `new` that equals another existing field of the row raises `OpError`.",
+    "reviews": ["r51d36b81", "r391641b2", "rbb0ea92a"],
+    "py_newer_only": false,
+    "probe_note": "rename([{a:1,b:2}], mapping={a:'b', b:'a'}) and mapping={a:'b', b:'c'} must both raise OpError (new 'b' equals the existing field 'b')."
+  },
+  {
+    "id": "D07",
+    "title": "Operation run() makes rows positional-only; rows passed by keyword gives TypeError",
+    "severity": "MAJOR",
+    "spec_quote": "Every operation lives in `dataops/ops/<name>.py` as `run(rows, **params) -> list[dict]` ... The interface is fixed.",
+    "reviews": ["r51d36b81", "r18fa3587"],
+    "py_newer_only": false,
+    "probe_note": "registry.get('select')(rows=[{a:1,b:2}], fields=['a']) must return [{a:1}]; the fixed signature run(rows, **params) accepts rows as a keyword."
+  },
+  {
+    "id": "D08",
+    "title": "cast to int rejects non-ASCII Unicode digit strings that match [+-]?\\d+",
+    "severity": "MAJOR",
+    "spec_quote": "`int`: from an int, a float with an integral value, or a string matching `[+-]?\\d+` after stripping.",
+    "reviews": ["r2dfec942", "r67177e05", "rfd0bb5d8", "rbe062d62", "rdbaabc49", "r3f3f3450", "r11c275d3", "r466eb88b"],
+    "py_newer_only": false,
+    "probe_note": "cast on [{a:'\\u0663'}, {a:' \\u0661\\u0662 '}, {a:'-\\uff11\\uff12'}] to int must give 3, 12, -12 (ints). In Python 3.9 re, \\d on str matches every Unicode decimal digit and int() accepts them."
+  },
+  {
+    "id": "D09",
+    "title": "cast to int of a digit string over 4300 digits escapes as ValueError (CLI traceback) instead of OpError",
+    "severity": "MAJOR",
+    "spec_quote": "a failing step raises `OpError` whose message starts with `step <i> (<op>): ` / every `OpError` exit with status 2 and one line on stderr, never a traceback.",
+    "reviews": ["r581e3f15"],
+    "py_newer_only": true,
+    "probe_note": "N/A when the interpreter has no int string-conversion limit (3.9.6). Else cast [{a:'1'*5000}] to int, directly and via run_pipeline: an exception other than OpError is DEFECT; returning an int or raising OpError is OK."
+  },
+  {
+    "id": "D10",
+    "title": "CLI prints a traceback when a valid result holds an int over 4300 digits",
+    "severity": "MINOR",
+    "spec_quote": "`python3 -m dataops PIPELINE.json INPUT.json` prints `json.dumps(result, sort_keys=True)`. Spec is silent: json.dumps itself fails here on newer interpreters and the exit-2 rule covers only invalid files/input and OpError.",
+    "reviews": ["r581e3f15"],
+    "py_newer_only": true,
+    "probe_note": "N/A when no int string-conversion limit. Else CLI group_sum by ['g'] over 20 rows of a 4300-digit int: a traceback, an exit code other than 0/2, or exit 2 with more than one stderr line is DEFECT."
+  },
+  {
+    "id": "D11",
+    "title": "CLI accepts overflowing numbers (1e400) as infinity and prints non-JSON 'Infinity'",
+    "severity": "MINOR",
+    "spec_quote": "\"Numeric\" means `int` or `float` but not `bool`, and not NaN or infinity. Spec is silent on JSON number literals that overflow a float; 1e400 is valid JSON and the CLI does print json.dumps(result).",
+    "reviews": ["r6e0733a7", "re3429b2f", "r581e3f15"],
+    "py_newer_only": false,
+    "probe_note": "CLI limit n=10 on [{a:1e400}] and fill value=1e999 on [{k:1}]: exit 0 with stdout that is not strict JSON (Infinity/NaN) is DEFECT; rejecting with exit 2 or printing finite JSON is OK."
+  },
+  {
+    "id": "D12",
+    "title": "join with non-scalar values in `other` crashes the CLI with a traceback",
+    "severity": "MAJOR",
+    "spec_quote": "Unreadable or invalid JSON files, an input that is not a list of objects, and every `OpError` exit with status 2 and one line on stderr, never a traceback.",
+    "reviews": ["rbb0ea92a", "r6e0733a7"],
+    "py_newer_only": false,
+    "probe_note": "CLI: join other=[{id:[1]}] / [{id:{a:1}}] on id; join other with v:[1,2] followed by dedupe, group_count by v, sort by v. Any traceback, exit not 0/2, or exit 2 without exactly one stderr line is DEFECT. (Non-scalar values are outside the spec; MAJOR only because the CLI crashes.)"
+  },
+  {
+    "id": "D13",
+    "title": "join accepts non-scalar values in `other` and copies them into the output",
+    "severity": "MINOR",
+    "spec_quote": "Rows are a list of dicts (JSON objects) whose values are strings, numbers, booleans or `None`. / `other` is a list of rows. Non-scalar values are outside what the spec defines.",
+    "reviews": ["rbb0ea92a", "r6e0733a7"],
+    "py_newer_only": false,
+    "probe_note": "get('join')([{k:1}], other=[{k:1, v:[1,2]}], on='k') and v:{x:1} must raise OpError; returning or another exception is DEFECT."
+  },
+  {
+    "id": "D14",
+    "title": "join checks for a shared non-`on` field only on matched pairs, not across both sides",
+    "severity": "MAJOR",
+    "spec_quote": "A field other than `on` present on both sides raises `OpError`.",
+    "reviews": ["r18fa3587"],
+    "py_newer_only": false,
+    "probe_note": "join([{k:1,b:1}], other=[{k:2,b:2}], on='k') with how inner and left must raise OpError ('b' is present on both sides although no row matches)."
+  },
+  {
+    "id": "D15",
+    "title": "group_sum (and group_stats) report 'not finite' when math.fsum overflows on an intermediate although the true sum is finite",
+    "severity": "MINOR",
+    "spec_quote": "The sum is an `int` when every summed value is an `int`, else a `float` computed with `math.fsum`; a sum that is not a finite float raises `OpError`. Spec is silent: math.fsum itself raises OverflowError on these values.",
+    "reviews": ["refe3759c"],
+    "py_newer_only": false,
+    "probe_note": "group_sum by ['g'] over v = 1e308, 1e308, -1e308 must return [{g:1, sum:1e308}] (float); any exception or other result is DEFECT."
+  },
+  {
+    "id": "D16",
+    "title": "group_stats raises 'mean not finite' for large ints whose true mean is a finite float",
+    "severity": "MAJOR",
+    "spec_quote": "`group_stats(by, field)`: as `group_sum`, adding the fields `count` (numeric values seen), `min`, `max` and `mean` ... a mean that is not a finite float raises `OpError`.",
+    "reviews": ["r11c275d3"],
+    "py_newer_only": false,
+    "probe_note": "group_stats by ['g'] over v = 10**308, 10**308 must return one row with count 2 and mean == 1e308 (finite float); an exception is DEFECT."
+  },
+  {
+    "id": "D17",
+    "title": "replace with a huge positive count (2**63) raises OverflowError instead of replacing",
+    "severity": "MAJOR",
+    "spec_quote": "`replace(field, old, new, count=None)`: replace `old` by `new` in the string value, at most `count` times (a positive integer) when given / a failing step raises `OpError` whose message starts with `step <i> (<op>): `",
+    "reviews": ["r7a9315db"],
+    "py_newer_only": false,
+    "probe_note": "replace([{s:'aaa'}], field='s', old='a', new='b', count=2**63) and count=10**30 must return [{s:'bbb'}]."
+  },
+  {
+    "id": "D18",
+    "title": "run_pipeline: a step dict with a non-string key raises TypeError instead of a prefixed OpError",
+    "severity": "MINOR",
+    "spec_quote": "a step is a dict `{\"op\": <name>, ...params}`; a failing step raises `OpError` whose message starts with `step <i> (<op>): `. Spec is silent on non-string parameter keys (impossible from JSON).",
+    "reviews": ["rdbaabc49"],
+    "py_newer_only": false,
+    "probe_note": "run_pipeline([{a:1}], [{'op':'limit', 1:2, 'n':1}]) must raise OpError starting with 'step 1 (limit): '."
+  },
+  {
+    "id": "D19",
+    "title": "CLI refuses existing file paths that begin with '-' or '--'",
+    "severity": "MINOR",
+    "spec_quote": "`python3 -m dataops PIPELINE.json INPUT.json` prints `json.dumps(result, sort_keys=True)`; `python3 -m dataops --list` ... Spec is silent on how dash-prefixed arguments other than --list are parsed.",
+    "reviews": ["r391641b2", "rdbaabc49"],
+    "py_newer_only": false,
+    "probe_note": "In a temp dir holding '--p.json' and '-p.json' (limit n=5) and i.json, run `python -m dataops --p.json i.json` and `-p.json i.json`; each must exit 0 and print [{\"a\": 1}]."
+  },
+  {
+    "id": "D20",
+    "title": "Unused imports in package modules (e.g. OpError imported but unused in ops)",
+    "severity": "MINOR",
+    "spec_quote": "Spec is silent (code quality).",
+    "reviews": ["r2dfec942"],
+    "py_newer_only": false,
+    "probe_note": "AST scan of dataops/**/*.py except __init__.py: an imported name never referenced as a Name and not in __all__ is DEFECT."
+  },
+  {
+    "id": "D21",
+    "title": "Helper code duplicated across modules (identical sum helper in group_sum and group_stats)",
+    "severity": "MINOR",
+    "spec_quote": "Spec is silent on code structure (step 1 only asks for 'the conventions the operations share').",
+    "reviews": ["rba0a1be0", "r7a9315db"],
+    "py_newer_only": false,
+    "probe_note": "AST scan of dataops/**/*.py: two functions of 5+ lines in different files with identical arguments and body (docstring ignored) is DEFECT."
+  },
+  {
+    "id": "D22",
+    "title": "Operation modules mix absolute (dataops.x) and relative (..x) intra-package imports",
+    "severity": "MINOR",
+    "spec_quote": "Spec is silent (style).",
+    "reviews": ["rba0a1be0"],
+    "py_newer_only": false,
+    "probe_note": "Over dataops/ops/<name>.py for the 20 ops: at least one module with an absolute dataops import and at least one with a relative import is DEFECT."
+  },
+  {
+    "id": "D23",
+    "title": "Unreachable error branch in fill (raise that no input can trigger)",
+    "severity": "MINOR",
+    "spec_quote": "Spec is silent (dead code).",
+    "reviews": ["r11c275d3", "r466eb88b"],
+    "py_newer_only": false,
+    "probe_note": "Heuristic: trace dataops/ops/fill.py while calling fill (registry and run_pipeline) with ~2,400 valid and invalid inputs (row shapes, field/value types, NaN/inf, missing/unknown params); any `raise` line never executed is DEFECT."
+  },
+  {
+    "id": "D24",
+    "title": "Missing deliverable (core module, ops module, doc page, test file, README, or registered op)",
+    "severity": "MAJOR",
+    "spec_quote": "Every operation lives in `dataops/ops/<name>.py` ... `docs/ops/<name>.md` for every operation ... `tests/test_<name>.py` for every operation. ... 3. A README with the list of operations and one pipeline example.",
+    "reviews": [],
+    "py_newer_only": false,
+    "probe_note": "No review names a missing deliverable; included as the deliverable-existence check. DEFECT if dataops/{__init__,registry,pipeline}.py, README*, any dataops/ops/<name>.py, docs/ops/<name>.md or tests/test_<name>.py is missing, or registry.names() lacks one of the 20 ops."
+  }
+]

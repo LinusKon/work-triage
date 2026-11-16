@@ -1,0 +1,52 @@
+{
+  "orchestrator": null,
+  "reviews": 0,
+  "review_points": [],
+  "fix_rounds": 0,
+  "steps": {
+    "1": {
+      "title": "Rename the key in config.py, client.py and tests/test_config.py",
+      "accepted": [
+        "Sonnet 5.5:medium",
+        "Sonnet 5.5:high",
+        "Opus 5.5:low",
+        "gpt-6.1-sol:medium",
+        "gpt-6-luna:high",
+        "gpt-6.1-terra:medium",
+        "parent"
+      ],
+      "floor": false,
+      "floor_kind": null,
+      "codex_first": false,
+      "required_dependencies": [],
+      "forbidden_dependencies": [],
+      "optional_dependencies": [],
+      "chain": null,
+      "chain_predecessor": null,
+      "never": []
+    },
+    "2": {
+      "title": "Rename the key in the README line and run the existing tests",
+      "accepted": [
+        "Sonnet 5.5:medium",
+        "Sonnet 5.5:high",
+        "Opus 5.5:low",
+        "gpt-6.1-sol:medium",
+        "gpt-6-luna:high",
+        "gpt-6.1-terra:medium",
+        "parent"
+      ],
+      "floor": false,
+      "floor_kind": null,
+      "codex_first": false,
+      "required_dependencies": [],
+      "forbidden_dependencies": [],
+      "optional_dependencies": [],
+      "chain": null,
+      "chain_predecessor": null,
+      "never": []
+    }
+  },
+  "name": "trivial",
+  "schema_version": 2
+}

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 360" width="820" height="360" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" role="img">
+<text x="70.0" y="52.0" font-size="13" fill="#59636e" text-anchor="start" font-weight="400">Median total cost of the skill against Opus 5.5 high without it, same tasks, per round.</text>
+<text x="70.0" y="30.0" font-size="18" fill="#1f2328" text-anchor="start" font-weight="600">The skill against no skill, version by version: from +106 % to -41 %</text>
+<line x1="70.0" y1="282.0" x2="800.0" y2="282.0" stroke="#d1d9e0" stroke-width="1"/>
+<text x="60.0" y="286.0" font-size="12" fill="#59636e" text-anchor="end" font-weight="400">-50 %</text>
+<line x1="70.0" y1="249.6" x2="800.0" y2="249.6" stroke="#d1d9e0" stroke-width="1"/>
+<text x="60.0" y="253.6" font-size="12" fill="#59636e" text-anchor="end" font-weight="400">-25 %</text>
+<line x1="70.0" y1="217.1" x2="800.0" y2="217.1" stroke="#1f2328" stroke-width="1.2"/>
+<text x="60.0" y="221.1" font-size="12" fill="#59636e" text-anchor="end" font-weight="400">+0 %</text>
+<line x1="70.0" y1="184.7" x2="800.0" y2="184.7" stroke="#d1d9e0" stroke-width="1"/>
+<text x="60.0" y="188.7" font-size="12" fill="#59636e" text-anchor="end" font-weight="400">+25 %</text>
+<line x1="70.0" y1="152.2" x2="800.0" y2="152.2" stroke="#d1d9e0" stroke-width="1"/>
+<text x="60.0" y="156.2" font-size="12" fill="#59636e" text-anchor="end" font-weight="400">+50 %</text>
+<line x1="70.0" y1="119.8" x2="800.0" y2="119.8" stroke="#d1d9e0" stroke-width="1"/>
+<text x="60.0" y="123.8" font-size="12" fill="#59636e" text-anchor="end" font-weight="400">+75 %</text>
+<rect x="115.5" y="80.0" width="106.5" height="137.1" rx="3" fill="#8c959f" fill-opacity="0.90"/>
+<text x="168.8" y="72.0" font-size="14" fill="#8c959f" text-anchor="middle" font-weight="700">+106 %</text>
+<text x="168.8" y="306.0" font-size="13" fill="#1f2328" text-anchor="middle" font-weight="600">2.1</text>
+<text x="168.8" y="324.0" font-size="11" fill="#59636e" text-anchor="middle" font-weight="400">small tasks</text>
+<rect x="293.0" y="209.7" width="106.5" height="7.4" rx="3" fill="#8c959f" fill-opacity="0.90"/>
+<text x="346.2" y="201.7" font-size="14" fill="#8c959f" text-anchor="middle" font-weight="700">+6 %</text>
+<text x="346.2" y="306.0" font-size="13" fill="#1f2328" text-anchor="middle" font-weight="600">2.2</text>
+<text x="346.2" y="324.0" font-size="11" fill="#59636e" text-anchor="middle" font-weight="400">small tasks</text>
+<rect x="470.5" y="217.1" width="106.5" height="41.8" rx="3" fill="#8250df" fill-opacity="0.90"/>
+<text x="523.8" y="276.9" font-size="14" fill="#8250df" text-anchor="middle" font-weight="700">-32 %</text>
+<text x="523.8" y="306.0" font-size="13" fill="#1f2328" text-anchor="middle" font-weight="600">2.5</text>
+<text x="523.8" y="324.0" font-size="11" fill="#59636e" text-anchor="middle" font-weight="400">large build H</text>
+<rect x="648.0" y="217.1" width="106.5" height="53.3" rx="3" fill="#8250df" fill-opacity="0.90"/>
+<text x="701.2" y="288.4" font-size="14" fill="#8250df" text-anchor="middle" font-weight="700">-41 %</text>
+<text x="701.2" y="306.0" font-size="13" fill="#1f2328" text-anchor="middle" font-weight="600">2.6</text>
+<text x="701.2" y="324.0" font-size="11" fill="#59636e" text-anchor="middle" font-weight="400">large build I</text>
+</svg>

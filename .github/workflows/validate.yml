@@ -1,0 +1,60 @@
+name: validate
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Scorer selftest
+        run: python3 tests/work-triage/score.py --selftest
+
+      - name: SKILL.md frontmatter
+        run: |
+          python3 - <<'PY'
+          import re, sys
+          text = open("skills/work-triage/SKILL.md", encoding="utf-8").read()
+          m = re.match(r"---\n(.*?)\n---\n", text, re.S)
+          if not m:
+              sys.exit("SKILL.md: no frontmatter block")
+          lines = m.group(1).splitlines()
+          fields, i = {}, 0
+          while i < len(lines):
+              key = re.match(r"(\w+):\s*(.*)$", lines[i])
+              i += 1
+              if not key:
+                  continue
+              name, value = key.groups()
+              if value in (">", ">-", "|", "|-", ""):
+                  block = []
+                  while i < len(lines) and (lines[i].startswith(" ") or not lines[i].strip()):
+                      block.append(lines[i].strip())
+                      i += 1
+                  value = " ".join(b for b in block if b) if name != "metadata" else "\n".join(block)
+              fields[name] = value.strip().strip('"').strip("'")
+          errors = []
+          if fields.get("name") != "work-triage":
+              errors.append(f"name is {fields.get('name')!r}, expected 'work-triage'")
+          description = fields.get("description", "")
+          if not description:
+              errors.append("description is missing")
+          elif len(description) > 1024:
+              errors.append(f"description has {len(description)} characters, limit 1024")
+          version = re.search(r"^version:\s*(\S+)", fields.get("metadata", ""), re.M)
+          if not version:
+              errors.append("metadata.version is missing")
+          if errors:
+              sys.exit("SKILL.md frontmatter:\n  " + "\n  ".join(errors))
+          print(f"SKILL.md frontmatter ok: version {version.group(1)}, description {len(description)} characters")
+          PY

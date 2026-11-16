@@ -1,0 +1,53 @@
+task,id,severity,strict_reading,newer_python_only,runs_base,runs_skill,title
+H,D01,major,,no,1,1,filter_range raises OpError when min > max instead of keeping no rows
+H,D02,minor,,no,5,5,Pipeline error prefix shows '?' instead of the given op when 'op' is not a string
+H,D03,major,,no,3,2,"Field-list parameters reject a repeated field name (drop, concat, ...)"
+H,D04,major,,no,1,2,"Field-list parameters reject an empty list (select, drop, concat, group_count)"
+H,D05,major,,no,1,1,rename rejects an empty mapping
+H,D06,major,,no,2,0,rename allows a new name equal to an existing field that is itself renamed (swap/chain)
+H,D07,major,,no,3,1,Operation run() makes rows positional-only; rows passed by keyword gives TypeError
+H,D08,major,,no,0,4,cast to int rejects non-ASCII Unicode digit strings that match [+-]?\d+
+H,D09,major,,yes,1,0,cast to int of a digit string over 4300 digits escapes as ValueError (CLI traceback) instead of OpError
+H,D10,minor,,yes,4,2,CLI prints a traceback when a valid result holds an int over 4300 digits
+H,D11,minor,,no,2,0,CLI accepts overflowing numbers (1e400) as infinity and prints non-JSON 'Infinity'
+H,D12,major,,no,1,0,join with non-scalar values in `other` crashes the CLI with a traceback
+H,D13,minor,,no,2,1,join accepts non-scalar values in `other` and copies them into the output
+H,D14,major,,no,1,2,"join checks for a shared non-`on` field only on matched pairs, not across both sides"
+H,D15,minor,,no,5,4,group_sum (and group_stats) report 'not finite' when math.fsum overflows on an intermediate although the true sum is finite
+H,D16,major,,no,0,1,group_stats raises 'mean not finite' for large ints whose true mean is a finite float
+H,D17,major,,no,0,1,replace with a huge positive count (2**63) raises OverflowError instead of replacing
+H,D18,minor,,no,1,1,run_pipeline: a step dict with a non-string key raises TypeError instead of a prefixed OpError
+H,D19,minor,,no,1,2,CLI refuses existing file paths that begin with '-' or '--'
+H,D20,minor,,no,0,1,Unused imports in package modules (e.g. OpError imported but unused in ops)
+H,D21,minor,,no,0,1,Helper code duplicated across modules (identical sum helper in group_sum and group_stats)
+H,D22,minor,,no,0,2,Operation modules mix absolute (dataops.x) and relative (..x) intra-package imports
+H,D23,minor,,no,0,1,Unreachable error branch in fill (raise that no input can trigger)
+H,D24,major,,no,0,0,"Missing deliverable (core module, ops module, doc page, test file, README, or registered op)"
+I,D01,major,no,no,1,0,Markdown loads rejects a valid line whose title is one character and that has tags (round trip fails)
+I,D02,major,yes,no,2,0,CSV dumps/loads cannot round-trip a valid task whose title contains NUL
+I,D03,minor,no,no,1,1,Saving resets an existing store file's permissions to 0600
+I,D04,minor,no,no,5,2,"import saves once per task (and again for done tasks): a failing save leaves a partial import, a done task can stay open; quadratic run time"
+I,D05,major,yes,no,2,4,Markdown loads accepts extra spaces around the title
+I,D06,major,yes,no,4,5,Markdown loads accepts zero-padded priority or id
+I,D07,major,yes,no,5,5,Markdown loads accepts tags out of order or repeated
+I,D08,major,yes,no,0,1,Markdown loads silently skips whitespace-only lines
+I,D09,minor,no,no,0,4,README tour shows the report command with no output
+I,D10,minor,no,no,0,3,"CLI numeric arguments accept non-ASCII digits (and _ separators, surrounding spaces)"
+I,D11,minor,no,no,0,2,"CLI error message on stderr can contain line separators other than newline (U+2028, \x0b, \x1c from arguments)"
+I,D12,minor,no,no,4,3,report.render sorts tag keys itself instead of following the dict's key order
+I,D13,minor,no,no,4,3,add accepts a title with undecodable bytes (lone surrogates); afterwards list fails for the whole store
+I,D14,minor,no,no,4,3,Store changes the process-wide umask (os.umask(0) then restore) while saving
+I,D15,minor,no,no,0,2,Plain `python3 -m unittest` discovers no tests (tests/ is not a package)
+I,D16,minor,no,no,5,4,`next ID RULE` fails unless a multi-word rule (every N days) is quoted
+I,D17,major,yes,no,5,1,Store.get/remove do not accept the parameter name `id` the fixed interface names
+I,D18,minor,no,no,1,0,A code example in the docs/README is not valid Python (garbled normalize example in docs/model.md)
+I,D19,major,yes,no,4,0,Query parser rejects valid queries nested more than 100 levels (not/parentheses)
+I,D20,major,yes,no,0,1,"Markdown dumps rejects (or loads splits) titles containing \x0b, \x0c, \x1c-\x1e, \x85, U+2028/2029"
+I,D21,minor,no,no,0,1,Unclosed-parenthesis error message says 'at position' twice
+I,D22,minor,no,no,0,1,docs/query.md says whitespace between tokens is optional without the 'around parentheses and operators' restriction
+I,D23,major,no,yes,4,0,Digit strings over 4300 characters end in a ValueError traceback (Python's int-conversion limit) instead of exit 2
+I,D24,minor,no,no,5,1,Saving through a symlinked store path replaces the symlink with a regular file; the target is never updated
+I,D25,minor,no,no,1,2,A newly created store file gets mode 0600 instead of following the umask
+I,D26,major,no,no,0,0,"Missing library module (tasktrack/__init__, __main__, model, store, query, recur, fmt_jsonl, fmt_csv, fmt_md, report)"
+I,D27,major,no,no,0,0,"Missing docs file (docs/model, store, query, recur, formats, report, cli .md) or README"
+I,D28,major,no,no,0,0,Missing per-module test file

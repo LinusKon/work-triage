@@ -1,0 +1,151 @@
+{
+  "orchestrator": null,
+  "reviews": 1,
+  "review_points": [
+    4
+  ],
+  "fix_rounds": 1,
+  "steps": {
+    "1": {
+      "title": "Find every place the key's variable name is used (names only, no values)",
+      "accepted": [
+        "Sonnet 5.5:medium",
+        "Opus 5.5:low",
+        "Opus 5.5:medium",
+        "parent"
+      ],
+      "floor": false,
+      "floor_kind": null,
+      "codex_first": false,
+      "required_dependencies": [],
+      "forbidden_dependencies": [],
+      "optional_dependencies": [],
+      "chain": null,
+      "chain_predecessor": null,
+      "never": [],
+      "read_only": true
+    },
+    "2": {
+      "title": "Create the new key",
+      "accepted": [
+        "user"
+      ],
+      "floor": false,
+      "floor_kind": null,
+      "codex_first": false,
+      "required_dependencies": [],
+      "forbidden_dependencies": [],
+      "optional_dependencies": [],
+      "chain": null,
+      "chain_predecessor": null,
+      "never": []
+    },
+    "3": {
+      "title": "Wire the secret-manager reference into the deploy script",
+      "accepted": [
+        "Opus 5.5:high",
+        "parent"
+      ],
+      "floor": true,
+      "floor_kind": "secrets",
+      "codex_first": false,
+      "required_dependencies": [
+        1,
+        2
+      ],
+      "forbidden_dependencies": [],
+      "optional_dependencies": [],
+      "chain": null,
+      "chain_predecessor": null,
+      "never": [
+        "Codex",
+        "Sonnet",
+        "Fable"
+      ],
+      "floor_minimum": "Opus 5.5:high"
+    },
+    "4": {
+      "title": "Review row 3",
+      "accepted": [
+        "Opus 5.5:high",
+        "Opus 5.5:xhigh"
+      ],
+      "floor": true,
+      "floor_kind": "secrets review",
+      "codex_first": false,
+      "required_dependencies": [
+        3
+      ],
+      "forbidden_dependencies": [],
+      "optional_dependencies": [],
+      "chain": null,
+      "chain_predecessor": null,
+      "never": [
+        "Codex",
+        "Sonnet",
+        "Fable"
+      ],
+      "floor_minimum": "Opus 5.5:high"
+    },
+    "5": {
+      "title": "Delete the old `.env` file and revoke the old key",
+      "accepted": [
+        "user"
+      ],
+      "floor": false,
+      "floor_kind": null,
+      "codex_first": false,
+      "required_dependencies": [
+        4
+      ],
+      "forbidden_dependencies": [],
+      "optional_dependencies": [],
+      "chain": null,
+      "chain_predecessor": null,
+      "never": []
+    },
+    "6": {
+      "title": "Deploy",
+      "accepted": [
+        "user"
+      ],
+      "floor": false,
+      "floor_kind": null,
+      "codex_first": false,
+      "required_dependencies": [
+        4
+      ],
+      "forbidden_dependencies": [],
+      "optional_dependencies": [],
+      "chain": null,
+      "chain_predecessor": null,
+      "never": []
+    },
+    "7": {
+      "title": "Verify the deployment and that no value is in the repository or the logs",
+      "accepted": [
+        "parent"
+      ],
+      "floor": true,
+      "floor_kind": "production read-only",
+      "codex_first": false,
+      "required_dependencies": [
+        5,
+        6
+      ],
+      "forbidden_dependencies": [],
+      "optional_dependencies": [],
+      "chain": null,
+      "chain_predecessor": null,
+      "never": [
+        "Codex",
+        "Sonnet",
+        "Fable"
+      ],
+      "floor_minimum": "Opus 5.5:medium",
+      "read_only": true
+    }
+  },
+  "name": "floor",
+  "schema_version": 2
+}

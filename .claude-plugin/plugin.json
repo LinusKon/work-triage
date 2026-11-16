@@ -1,0 +1,11 @@
+{
+  "name": "work-triage",
+  "version": "2.6.0",
+  "description": "Decides model and level for agent work: solo when it fits one session, otherwise a strong main session orchestrating few batched workers on cheaper models; floors, gates, a spec check and a hardening pass before done.",
+  "author": {
+    "name": "work-triage contributors"
+  },
+  "repository": "https://github.com/LinusKon/work-triage",
+  "license": "MIT",
+  "keywords": ["triage", "subagents", "orchestration", "model-selection", "codex"]
+}

@@ -1,0 +1,282 @@
+[
+  {
+    "id": "D01",
+    "title": "Markdown loads rejects a valid line whose title is one character and that has tags (round trip fails)",
+    "severity": "MAJOR",
+    "strict_reading": false,
+    "spec_quote": "`loads(dumps(tasks)) == tasks` for normalized tasks. / Lines that are empty are ignored on load; any other line that does not have this shape raises `TaskError`.",
+    "reviews": ["r660acb1e", "rd07a5131"],
+    "py_newer_only": false,
+    "probe_note": "t = [normalize({id:1, title:'X', tags:['home'], created:'2026-01-01'})]; fmt_md.loads(fmt_md.dumps(t)) must equal t. Any exception or difference is DEFECT. The line '- [ ] X #home !3 ^2026-01-01 (1)' has exactly the specified shape."
+  },
+  {
+    "id": "D02",
+    "title": "CSV dumps/loads cannot round-trip a valid task whose title contains NUL",
+    "severity": "MAJOR",
+    "strict_reading": true,
+    "spec_quote": "`loads(dumps(tasks)) == tasks` for normalized tasks. (fmt_csv: \"the `csv` module\"; Python 3.9's csv reader rejects NUL, so a literal reading demands a workaround.)",
+    "reviews": ["rd07a5131"],
+    "py_newer_only": false,
+    "probe_note": "t = [normalize({id:1, title:'nul\\x00x', created:'2026-01-01'})]; fmt_csv.loads(fmt_csv.dumps(t)) must equal t; an exception or difference is DEFECT. N/A if normalize itself rejects the title. strict_reading because the spec also mandates the csv module, whose 3.9 reader cannot read NUL; some implementations document the limit."
+  },
+  {
+    "id": "D03",
+    "title": "Saving resets an existing store file's permissions to 0600",
+    "severity": "MINOR",
+    "strict_reading": false,
+    "spec_quote": "Spec is silent on file permissions (\"Every change is saved at once, through a temporary file in the same folder and `os.replace`\").",
+    "reviews": ["r660acb1e", "rd07a5131", "rfd3585fa", "r09842364"],
+    "py_newer_only": false,
+    "probe_note": "Write a valid empty store, chmod 0644, Store(path).add(...); mode must still be 0644. POSIX only (N/A elsewhere)."
+  },
+  {
+    "id": "D04",
+    "title": "import saves once per task (and again for done tasks): a failing save leaves a partial import, a done task can stay open; quadratic run time",
+    "severity": "MINOR",
+    "strict_reading": false,
+    "spec_quote": "`import FORMAT FILE --today DATE` adds every task of the file as a new task (new ids, `created` = `today`, other fields kept) and prints how many. Spec is silent on atomicity and speed of import.",
+    "reviews": ["r660acb1e", "r09842364", "r541d4d01", "rd86671a9", "r6503976a", "ra51c8072", "r21fc10b7", "r0578d97a"],
+    "py_newer_only": false,
+    "probe_note": "Store with one task; run the CLI import of 3 jsonl tasks in a subprocess where os.replace (the mechanism the spec mandates) fails on its 2nd call. Afterwards the store must hold 1 task (nothing imported) or 4 (all imported in one save); any other count is DEFECT."
+  },
+  {
+    "id": "D05",
+    "title": "Markdown loads accepts extra spaces around the title",
+    "severity": "MAJOR",
+    "strict_reading": true,
+    "spec_quote": "one line per task, `- [ ] TITLE` or `- [x] TITLE` (done), followed in this order by ... Lines that are empty are ignored on load; any other line that does not have this shape raises `TaskError`.",
+    "reviews": ["r41162b5a", "r933d02da", "r0578d97a", "r8615ef86"],
+    "py_newer_only": false,
+    "probe_note": "fmt_md.loads must raise TaskError for '- [ ]  Buy !2 ^2026-01-01 (7)' and for '- [ ] Buy  !2 ^2026-01-01 (7)'; accepting either is DEFECT. strict_reading: whether a padded title still 'has this shape' is a literal reading."
+  },
+  {
+    "id": "D06",
+    "title": "Markdown loads accepts zero-padded priority or id",
+    "severity": "MAJOR",
+    "strict_reading": true,
+    "spec_quote": "followed in this order by ... ` !PRIORITY`, ... ` (ID)`. ... any other line that does not have this shape raises `TaskError`.",
+    "reviews": ["r41162b5a", "r933d02da", "r8615ef86"],
+    "py_newer_only": false,
+    "probe_note": "fmt_md.loads must raise TaskError for '- [ ] Buy !02 ^2026-01-01 (7)' and for '- [ ] Buy !2 ^2026-01-01 (007)'; accepting either is DEFECT."
+  },
+  {
+    "id": "D07",
+    "title": "Markdown loads accepts tags out of order or repeated",
+    "severity": "MAJOR",
+    "strict_reading": true,
+    "spec_quote": "followed in this order by ` #TAG` for every tag ... any other line that does not have this shape raises `TaskError`. (Tags of a normalized task are de-duplicated and sorted.)",
+    "reviews": ["r41162b5a", "r933d02da"],
+    "py_newer_only": false,
+    "probe_note": "fmt_md.loads must raise TaskError for '- [ ] Buy #b #a !2 ^2026-01-01 (7)' and for '- [ ] Buy #a #a !2 ^2026-01-01 (7)'; accepting either is DEFECT. strict_reading: one reviewer (r660acb1e) reads such a hand-written line as having the shape."
+  },
+  {
+    "id": "D08",
+    "title": "Markdown loads silently skips whitespace-only lines",
+    "severity": "MAJOR",
+    "strict_reading": true,
+    "spec_quote": "Lines that are empty are ignored on load; any other line that does not have this shape raises `TaskError`.",
+    "reviews": ["r59675a8e", "r6503976a"],
+    "py_newer_only": false,
+    "probe_note": "fmt_md.loads('   \\n' + valid line) and fmt_md.loads('\\t\\n' + valid line) must raise TaskError; returning tasks is DEFECT. strict_reading: 'empty' versus 'blank' (the jsonl sentence says 'blank lines')."
+  },
+  {
+    "id": "D09",
+    "title": "README tour shows the report command with no output",
+    "severity": "MINOR",
+    "strict_reading": false,
+    "spec_quote": "a README with a short tour. Spec is silent on its exact content.",
+    "reviews": ["r41162b5a", "rfd3585fa", "r09842364", "r4fc5e82f"],
+    "py_newer_only": false,
+    "probe_note": "In README*, a line invoking `tasktrack ... report` that is directly followed by a closing code fence is DEFECT."
+  },
+  {
+    "id": "D10",
+    "title": "CLI numeric arguments accept non-ASCII digits (and _ separators, surrounding spaces)",
+    "severity": "MINOR",
+    "strict_reading": false,
+    "spec_quote": "bad arguments exit with status 2 and one line on stderr. Spec does not define the accepted digit syntax of ID / --priority N.",
+    "reviews": ["ra8b6f373", "r4fc5e82f"],
+    "py_newer_only": false,
+    "probe_note": "`done \\u0661` (Arabic-Indic one) on a store with task 1, and `add y --priority \\u0662 --today 2026-01-01`; exit 0 for either is DEFECT."
+  },
+  {
+    "id": "D11",
+    "title": "CLI error message on stderr can contain line separators other than newline (U+2028, \\x0b, \\x1c from arguments)",
+    "severity": "MINOR",
+    "strict_reading": false,
+    "spec_quote": "exit with status 2 and one line on stderr, never a traceback. Spec does not define line separators beyond the newline; the message is one newline-terminated line.",
+    "reviews": ["rfd3585fa"],
+    "py_newer_only": false,
+    "probe_note": "`add a 'b\\u2028c\\x0bd\\x1ce' --today 2026-01-01` (an extra positional): stderr.decode().splitlines() must have exactly one element; more is DEFECT. N/A if the command does not exit 2."
+  },
+  {
+    "id": "D12",
+    "title": "report.render sorts tag keys itself instead of following the dict's key order",
+    "severity": "MINOR",
+    "strict_reading": false,
+    "spec_quote": "then `tag NAME: N` per tag in key order. Only differs for a by_tag dict not built by summary() (whose keys are sorted), i.e. input outside a valid summary.",
+    "reviews": ["rfd3585fa"],
+    "py_newer_only": false,
+    "probe_note": "render({... by_tag: {'b': 1, 'a': 2}}) must list 'tag b: 1' before 'tag a: 2'; sorted output is DEFECT."
+  },
+  {
+    "id": "D13",
+    "title": "add accepts a title with undecodable bytes (lone surrogates); afterwards list fails for the whole store",
+    "severity": "MINOR",
+    "strict_reading": false,
+    "spec_quote": "Spec is silent on non-UTF-8 argv; exit 2 with one line holds.",
+    "reviews": ["r09842364", "r0e6c15b1", "r21fc10b7"],
+    "py_newer_only": false,
+    "probe_note": "CLI `add b'bad\\xff' --today 2026-01-01` (bytes argv); if add exits 0, a following default `list` must exit 0. add accepted and list failing is DEFECT. POSIX only."
+  },
+  {
+    "id": "D14",
+    "title": "Store changes the process-wide umask (os.umask(0) then restore) while saving",
+    "severity": "MINOR",
+    "strict_reading": false,
+    "spec_quote": "Spec is silent on umask handling.",
+    "reviews": ["r0e83bce2", "r541d4d01", "rd86671a9", "ra51c8072", "r933d02da", "r8615ef86"],
+    "py_newer_only": false,
+    "probe_note": "Subprocess wraps os.umask with a recording spy before importing tasktrack, then Store(new path).add + update; any os.umask call is DEFECT (each call changes the process umask, racing other threads)."
+  },
+  {
+    "id": "D15",
+    "title": "Plain `python3 -m unittest` discovers no tests (tests/ is not a package)",
+    "severity": "MINOR",
+    "strict_reading": false,
+    "spec_quote": "tests with `unittest` under `tests/`. Spec does not fix the test command.",
+    "reviews": ["r0e83bce2", "r0e6c15b1", "r6efe1e11"],
+    "py_newer_only": false,
+    "probe_note": "In a subprocess, unittest.defaultTestLoader.discover('.') (what bare `python -m unittest` runs) must find at least one test; 0 is DEFECT."
+  },
+  {
+    "id": "D16",
+    "title": "`next ID RULE` fails unless a multi-word rule (every N days) is quoted",
+    "severity": "MINOR",
+    "strict_reading": false,
+    "spec_quote": "`next ID RULE` sets the task's due date to `next_due` of its current one. Spec is silent on shell quoting.",
+    "reviews": ["r0e6c15b1"],
+    "py_newer_only": false,
+    "probe_note": "Task 1 due 2026-01-05; `next 1 every 3 days` (unquoted, three argv words) must exit 0 and print 2026-01-08; anything else is DEFECT."
+  },
+  {
+    "id": "D17",
+    "title": "Store.get/remove do not accept the parameter name `id` the fixed interface names",
+    "severity": "MAJOR",
+    "strict_reading": true,
+    "spec_quote": "The interface is fixed. ... `get(id) -> dict`, ... `remove(id)`",
+    "reviews": ["r541d4d01"],
+    "py_newer_only": false,
+    "probe_note": "s.get(id=1) must return task 1 and s.remove(id=2) must remove task 2; TypeError is DEFECT. update is not probed (a parameter named id would clash with update(1, id=5)). strict_reading: keyword use of the parameter name is a literal reading of the signature."
+  },
+  {
+    "id": "D18",
+    "title": "A code example in the docs/README is not valid Python (garbled normalize example in docs/model.md)",
+    "severity": "MINOR",
+    "strict_reading": false,
+    "spec_quote": "`docs/<module>.md` ... (what it does, its functions or commands, one example each). Another working example exists, so the deliverable is not missing.",
+    "reviews": ["r8748502b", "r933d02da"],
+    "py_newer_only": false,
+    "probe_note": "Compile every doctest example (>>>), every `python3 -c '...'` body and every ```python block without >>> in docs/*.md and README*; any SyntaxError is DEFECT."
+  },
+  {
+    "id": "D19",
+    "title": "Query parser rejects valid queries nested more than 100 levels (not/parentheses)",
+    "severity": "MAJOR",
+    "strict_reading": true,
+    "spec_quote": "`parse(text) -> callable` returns a predicate over tasks; `TaskError` on a syntax error. ... An unknown field, a bad number or date, an unclosed parenthesis or quote, a missing operand and trailing tokens are syntax errors.",
+    "reviews": ["r933d02da"],
+    "py_newer_only": false,
+    "probe_note": "parse('not '*150 + 'tag:x') and parse('('*150 + 'tag:x' + ')'*150) must return predicates that are true for a task tagged x; any exception or false is DEFECT. strict_reading: a depth guard is a common engineering limit."
+  },
+  {
+    "id": "D20",
+    "title": "Markdown dumps rejects (or loads splits) titles containing \\x0b, \\x0c, \\x1c-\\x1e, \\x85, U+2028/2029",
+    "severity": "MAJOR",
+    "strict_reading": true,
+    "spec_quote": "`loads(dumps(tasks)) == tasks` for normalized tasks. / Titles never contain ` #`, ` !`, ` @`, ` ^` or ` (` in this format: `dumps` raises `TaskError` for such a title.",
+    "reviews": ["r4fc5e82f", "r6efe1e11"],
+    "py_newer_only": false,
+    "probe_note": "For each of \\x0b \\x0c \\x1c \\x1d \\x1e \\x85 \\u2028 \\u2029, t=[normalize({title:'a'+ch+'b',...})] must satisfy fmt_md.loads(fmt_md.dumps(t)) == t; any exception or difference is DEFECT. strict_reading: whether these count as line breaks in a one-line-per-task format is debatable."
+  },
+  {
+    "id": "D21",
+    "title": "Unclosed-parenthesis error message says 'at position' twice",
+    "severity": "MINOR",
+    "strict_reading": false,
+    "spec_quote": "Spec is silent on message wording (\"an unclosed parenthesis ... [is a] syntax error\").",
+    "reviews": ["r4fc5e82f"],
+    "py_newer_only": false,
+    "probe_note": "parse('(tag:a') raises TaskError; a message containing 'at position' more than once is DEFECT. N/A if no TaskError."
+  },
+  {
+    "id": "D22",
+    "title": "docs/query.md says whitespace between tokens is optional without the 'around parentheses and operators' restriction",
+    "severity": "MINOR",
+    "strict_reading": false,
+    "spec_quote": "whitespace between tokens optional around parentheses and operators. Docs wording only.",
+    "reviews": ["r4fc5e82f"],
+    "py_newer_only": false,
+    "probe_note": "In docs/query.md, a sentence (split at . or ;) that mentions 'whitespace' and 'optional' but none of parenthes/operator/around/only/except/word is DEFECT. N/A without docs/query.md."
+  },
+  {
+    "id": "D23",
+    "title": "Digit strings over 4300 characters end in a ValueError traceback (Python's int-conversion limit) instead of exit 2",
+    "severity": "MAJOR",
+    "strict_reading": false,
+    "spec_quote": "Every `TaskError`, an unreadable file and bad arguments exit with status 2 and one line on stderr, never a traceback.",
+    "reviews": ["r8615ef86"],
+    "py_newer_only": true,
+    "probe_note": "CLI with a 5000-digit number: `list --query priority=N`, `import md` of a line with id (N), `import csv` with id N. Any 'Traceback' on stderr or exit code other than 0/2 is DEFECT. Python 3.9.6 has no int-string limit, so this shows only on newer interpreters (3.11+, and later 3.9/3.10 security releases)."
+  },
+  {
+    "id": "D24",
+    "title": "Saving through a symlinked store path replaces the symlink with a regular file; the target is never updated",
+    "severity": "MINOR",
+    "strict_reading": false,
+    "spec_quote": "Spec is silent on symlinks (\"through a temporary file in the same folder and `os.replace`\").",
+    "reviews": ["rfd3585fa", "r541d4d01"],
+    "py_newer_only": false,
+    "probe_note": "link.json -> real/t.json (valid empty store); Store(link).add(...); link must still be a symlink and the target must hold the task; otherwise DEFECT. POSIX only."
+  },
+  {
+    "id": "D25",
+    "title": "A newly created store file gets mode 0600 instead of following the umask",
+    "severity": "MINOR",
+    "strict_reading": false,
+    "spec_quote": "Spec is silent on file permissions.",
+    "reviews": ["ra8b6f373"],
+    "py_newer_only": false,
+    "probe_note": "Subprocess with umask 022: Store(new path).add(...); the file mode must be 0644; otherwise DEFECT. POSIX only."
+  },
+  {
+    "id": "D26",
+    "title": "Missing library module (tasktrack/__init__, __main__, model, store, query, recur, fmt_jsonl, fmt_csv, fmt_md, report)",
+    "severity": "MAJOR",
+    "strict_reading": false,
+    "spec_quote": "`tasktrack/model.py` ... `tasktrack/store.py` ... `tasktrack/query.py` ... `tasktrack/recur.py` ... `tasktrack/fmt_jsonl.py` ... `tasktrack/fmt_csv.py` ... `tasktrack/fmt_md.py` ... `tasktrack/report.py` ... (`python3 -m tasktrack --file PATH COMMAND …`)",
+    "reviews": [],
+    "py_newer_only": false,
+    "probe_note": "File-existence probe for each listed tasktrack/*.py (__main__.py is what `python -m tasktrack` needs). Any missing is DEFECT. No review reported it."
+  },
+  {
+    "id": "D27",
+    "title": "Missing docs file (docs/model, store, query, recur, formats, report, cli .md) or README",
+    "severity": "MAJOR",
+    "strict_reading": false,
+    "spec_quote": "`docs/<module>.md` for `model`, `store`, `query`, `recur`, `formats`, `report` and `cli` ... and a README with a short tour.",
+    "reviews": [],
+    "py_newer_only": false,
+    "probe_note": "File-existence probe for the seven docs/*.md and any README* at the root. Any missing is DEFECT. No review reported it."
+  },
+  {
+    "id": "D28",
+    "title": "Missing per-module test file",
+    "severity": "MAJOR",
+    "strict_reading": false,
+    "spec_quote": "`tests/test_<module>.py` per module.",
+    "reviews": [],
+    "py_newer_only": false,
+    "probe_note": "Requires tests/test_model, test_store, test_query, test_recur, test_report, a CLI test (test_cli or test_main/test___main__), and either all of test_fmt_jsonl/test_fmt_csv/test_fmt_md or test_formats. Any missing is DEFECT. No review reported it."
+  }
+]

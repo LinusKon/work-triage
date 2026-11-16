@@ -1,0 +1,189 @@
+{
+  "orchestrator": null,
+  "reviews": 0,
+  "review_points": [],
+  "fix_rounds": 1,
+  "steps": {
+    "1": {
+      "title": "Write the shot list and prompts for all four beats",
+      "accepted": [
+        "Opus 5.5:medium",
+        "parent"
+      ],
+      "floor": false,
+      "floor_kind": null,
+      "codex_first": false,
+      "required_dependencies": [],
+      "forbidden_dependencies": [],
+      "optional_dependencies": [],
+      "chain": null,
+      "chain_predecessor": null,
+      "never": [
+        "Codex"
+      ]
+    },
+    "2": {
+      "title": "Generate beat 1 (paid); the user approves the take",
+      "accepted": [
+        "parent"
+      ],
+      "floor": false,
+      "floor_kind": null,
+      "codex_first": false,
+      "required_dependencies": [
+        1
+      ],
+      "forbidden_dependencies": [],
+      "optional_dependencies": [],
+      "chain": "beats",
+      "chain_predecessor": null,
+      "never": [
+        "Codex"
+      ]
+    },
+    "3": {
+      "title": "Generate beat 2 from beat 1's end frame",
+      "accepted": [
+        "parent"
+      ],
+      "floor": false,
+      "floor_kind": null,
+      "codex_first": false,
+      "required_dependencies": [
+        2
+      ],
+      "forbidden_dependencies": [],
+      "optional_dependencies": [],
+      "chain": "beats",
+      "chain_predecessor": 2,
+      "never": [
+        "Codex"
+      ]
+    },
+    "4": {
+      "title": "Generate beat 3 from beat 2's end frame",
+      "accepted": [
+        "parent"
+      ],
+      "floor": false,
+      "floor_kind": null,
+      "codex_first": false,
+      "required_dependencies": [
+        3
+      ],
+      "forbidden_dependencies": [],
+      "optional_dependencies": [],
+      "chain": "beats",
+      "chain_predecessor": 3,
+      "never": [
+        "Codex"
+      ]
+    },
+    "5": {
+      "title": "Generate beat 4 from beat 3's end frame",
+      "accepted": [
+        "parent"
+      ],
+      "floor": false,
+      "floor_kind": null,
+      "codex_first": false,
+      "required_dependencies": [
+        4
+      ],
+      "forbidden_dependencies": [],
+      "optional_dependencies": [],
+      "chain": "beats",
+      "chain_predecessor": 4,
+      "never": [
+        "Codex"
+      ]
+    },
+    "6": {
+      "title": "Write a script that extracts a clip's last frame and checks its size, with a selftest",
+      "accepted": [
+        "gpt-6.1-sol:medium",
+        "Sonnet 5.5:high"
+      ],
+      "floor": false,
+      "floor_kind": null,
+      "codex_first": true,
+      "required_dependencies": [],
+      "forbidden_dependencies": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "optional_dependencies": [],
+      "chain": null,
+      "chain_predecessor": null,
+      "never": []
+    },
+    "7": {
+      "title": "Collect sound references for the four beats",
+      "accepted": [
+        "Sonnet 5.5:medium"
+      ],
+      "floor": false,
+      "floor_kind": null,
+      "codex_first": false,
+      "required_dependencies": [],
+      "forbidden_dependencies": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "optional_dependencies": [
+        1
+      ],
+      "chain": null,
+      "chain_predecessor": null,
+      "never": []
+    },
+    "8": {
+      "title": "Write a script that joins four clips, with a selftest on dummy clips",
+      "accepted": [
+        "gpt-6.1-sol:medium",
+        "Sonnet 5.5:high"
+      ],
+      "floor": false,
+      "floor_kind": null,
+      "codex_first": true,
+      "required_dependencies": [],
+      "forbidden_dependencies": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "optional_dependencies": [],
+      "chain": null,
+      "chain_predecessor": null,
+      "never": []
+    },
+    "9": {
+      "title": "Join the real clips and check the cut",
+      "accepted": [
+        "parent",
+        "Sonnet 5.5:medium"
+      ],
+      "floor": false,
+      "floor_kind": null,
+      "codex_first": false,
+      "required_dependencies": [
+        5,
+        8
+      ],
+      "forbidden_dependencies": [],
+      "optional_dependencies": [],
+      "chain": null,
+      "chain_predecessor": null,
+      "never": [
+        "Codex"
+      ]
+    }
+  },
+  "name": "chain",
+  "schema_version": 2
+}
