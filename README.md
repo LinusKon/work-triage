@@ -4,7 +4,7 @@ A skill for omp (oh-my-pi) and Claude Code that decides which model and thinking
 
 <a href="study/film/work-triage-1920x1080.mp4"><img src="study/film/work-triage-preview.gif" alt="A stack of work blocks that starts red, every block on Opus, and turns cream block by block as the work moves to Sonnet."></a>
 
-36-second film with sound: [16:9](study/film/work-triage-1920x1080.mp4) · [4:5](study/film/work-triage-1080x1350.mp4)
+33-second film with sound: [16:9](study/film/work-triage-1920x1080.mp4) · [4:5](study/film/work-triage-1080x1350.mp4)
 
 - **What it saves:** about a third of the cost of a large agent build, with the same hidden acceptance tests
   passing. The saving depends on the harness version, so it is measured per omp version.

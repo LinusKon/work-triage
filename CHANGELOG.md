@@ -6,6 +6,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+- The film uses a new voice-over, read as one continuous take, and runs 33.5 s.
+
 ### Changed
 
 - README rebuilt: a 15-second summary at the top, one evidence table with every measurement, a "Who gets what"
