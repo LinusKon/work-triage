@@ -4,8 +4,8 @@
 It tells the main session when to work alone and, when it hands work out, which model and level each part gets.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="study/charts/cost-large-builds-dark.svg">
-  <img src="study/charts/cost-large-builds-light.svg" alt="Total cost per run on two large builds, with and without the skill: every run as a dot, medians as lines.">
+  <source media="(prefers-color-scheme: dark)" srcset="study/charts/share-card-dark.svg">
+  <img src="study/charts/share-card-light.svg" alt="Large agent builds, about a third cheaper: minus 32 % on build H ($6.06 to $4.11) and minus 41 % on build I ($7.76 to $4.58), every run shown as a dot.">
 </picture>
 
 | | Build H: 20 plug-in operations | Build I: layered task tracker |

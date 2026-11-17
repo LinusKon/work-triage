@@ -6,6 +6,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Added
+
+- A share card at the top of the README (`study/charts/share-card-*.svg`, `share-card.png`), drawn from
+  `study/data/runs.csv` by `study/share_card.py`.
+
 ## [2.6.1] - 2026-11-16
 
 ### Changed
