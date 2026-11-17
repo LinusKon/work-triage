@@ -16,7 +16,10 @@ mkdir -p "$out"
 
 level=high
 case "$arm" in
-    skill261) skill="$STUDY/skills/2.6.1/work-triage" ;;
+    skill261|skill261v22) skill="$STUDY/skills/2.6.1/work-triage" ;;  # v22: the same skill, run on omp 18.22.0
+    # nc: the prompt does not mention Codex, as for a user who has only Claude.
+    skill261nc) skill="$STUDY/skills/2.6.1/work-triage"; tools='Subagents (the task tool) are available.' ;;
+    base22nc)   skill=""; tools='Subagents (the task tool) are available.' ;;
     skill26)  skill="$STUDY/skills/2.6.0/work-triage" ;;
     skill25)  skill="$STUDY/skills/2.5.0/work-triage" ;;
     skill24)  skill="$STUDY/skills/2.4.0/work-triage" ;;
@@ -26,15 +29,34 @@ case "$arm" in
     skill201) skill="$STUDY/skills/2.0.1/work-triage" ;;
     base)     skill="" ;;
     basemed)  skill=""; level=medium ;;
+    # 2026-11-17, omp 18.22.0. The wt-* agents had been installed for every project that morning, so `baseauto`
+    # ran with them in the task tool's agent list. `autoclean` and `base22` run with the agents removed,
+    # `agentshigh` with them installed; none of the four reads the skill.
+    baseauto|autoclean) skill=""; level=auto ;;
+    base22|agentshigh)  skill="" ;;
     basespawn) skill=""; extra='Distribute the work across subagents with the task tool: the operations are written by subagents, not by you.' ;;
     *) echo "unknown arm: $arm" >&2; exit 2 ;;
 esac
 spec="$HERE/tasks/$task.md"
 [ -f "$spec" ] || { echo "unknown task: $task" >&2; exit 2; }
 
+# A run without the skill must not see the skill's agents: installed for every project they change the baseline
+# (2026-11-17: `baseauto` used them). `agentshigh` is the one arm that wants them.
+if [ -z "$skill" ] && [ "$arm" != agentshigh ] && ls "$HOME/.omp/agent/agents"/wt-*.md >/dev/null 2>&1; then
+    echo "refusing $id: wt-* agents are installed in ~/.omp/agent/agents; move them away for runs without the skill" >&2
+    exit 4
+fi
+# A series belongs to one omp version: set WT_OMP_VERSION to pin it; the version is stored with every run.
+omp_version=$(omp --version 2>/dev/null | tail -1)
+if [ -n "${WT_OMP_VERSION:-}" ] && [ "$omp_version" != "$WT_OMP_VERSION" ]; then
+    echo "refusing $id: omp is $omp_version, the series is pinned to $WT_OMP_VERSION" >&2
+    exit 5
+fi
+echo "$omp_version" > "$out/omp_version.txt"
+
 {
     [ -n "$skill" ] && printf 'Read the work-triage skill at `%s/SKILL.md` and follow it.\n\n' "$skill"
-    printf 'Plan and run this in this repository. Subagents (the task tool) and the Codex CLI (`codex exec`, logged in) are available.\n\n'
+    printf 'Plan and run this in this repository. %s\n\n' "${tools:-Subagents (the task tool) and the Codex CLI (\`codex exec\`, logged in) are available.}"
     [ -n "${extra:-}" ] && printf '%s\n\n' "$extra"
     cat "$spec"
 } > "$out/prompt.txt"

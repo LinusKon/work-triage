@@ -17,8 +17,21 @@ It tells the main session when to work alone and, when it hands work out, which 
 | Hidden acceptance test (run after the session ends; no session saw it) | 5/5 and 5/5 pass | 5/5 and 5/5 pass |
 | Major defects, graded blind (no skill / skill) | 14 / 15 | 27 / 17 |
 
-Both pass bars were written down before the runs. The numbers come from 95 measured runs on nine tasks; the
+Both pass bars were written down before the runs. The numbers come from 130 measured runs on nine tasks; the
 [study](study/README.md) has the method, the data, every chart's source and the rounds where the skill lost.
+
+**The saving depends on the harness version, so it is measured per version.** omp changes how subagents run from
+release to release. The two builds above ran in omp 18.21.0; build I was measured again in 18.22.0, which by itself
+runs subagents at lower thinking levels:
+
+| Build I, five runs per setup, median total cost | No skill | With the skill | Change |
+|---|---|---|---|
+| omp 18.21.0, prompt names Codex as available (2026-11-16) | $7.76 | $4.58 | −41 % |
+| omp 18.22.0, prompt names Codex as available (2026-11-17) | $5.91 | $4.25 | −28 %, p = 0.0159 |
+| omp 18.22.0, prompt names no Codex: Claude only (2026-11-17) | $6.43 | $4.28 | −33.5 %, p = 0.0040 |
+
+Every run in the table passed the hidden test. The 18.22.0 rows checked cost and the hidden test only; no defects
+were graded there.
 
 ## The short version
 
@@ -114,7 +127,8 @@ cp ~/src/work-triage/skills/work-triage/agents/*.md ~/.omp/agent/agents/
 ```
 
 Then start work as usual, for example: *"Load the work-triage skill, then plan and build this: …"*.
-The measurements were taken in omp 18.20.3. In Claude Code the skill's rules apply, but the three agent files are
+The measurements were taken in omp 18.21.0 and 18.22.0 (the first small-task rounds in 18.20.3; every run's version
+is in the data). In Claude Code the skill's rules apply, but the three agent files are
 omp definitions: in Claude Code the same roles are spawned with model and effort named in each call (see
 [`references/harness-claude-code.md`](skills/work-triage/references/harness-claude-code.md)).
 
@@ -162,10 +176,11 @@ key changes, pushes, deploys, paid calls and anything irreversible happen only o
   <img src="study/charts/small-tasks-light.svg" alt="Small tasks: median cost per run without the skill, with it, and without it with the main session at medium.">
 </picture>
 
-- **Narrow by design.** One harness (omp 18.20.3), one main-session model (Opus 5.5 `high`), Python builds that take
-  a session ten to twenty minutes, five runs per arm (an arm is one setup: skill or no skill), tasks written by the
-  skill's authors. In Claude dollars alone the saving is 20 % and 23 %; the rest is Codex work the baseline bought
-  at a higher price.
+- **Narrow by design.** One harness (omp, three versions), one main-session model (Opus 5.5 `high`), Python builds
+  that take a session ten to twenty minutes, five runs per arm (an arm is one setup: skill or no skill), tasks
+  written by the skill's authors. Where the prompt names Codex, part of the saving is a Codex review the baseline
+  bought and the skill did not (in Claude dollars alone: 20 % and 23 % in omp 18.21.0). Where it names no Codex, the
+  baseline reviews with Opus subagents instead and the saving is 33.5 %.
 - **Quality is the same, not better.** Both arms ship one to six spec-edge defects per build that neither tests nor
   reviews caught reliably.
 

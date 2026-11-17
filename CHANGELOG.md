@@ -10,6 +10,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 - A share card at the top of the README (`study/charts/share-card-*.svg`, `share-card.png`), drawn from
   `study/data/runs.csv` by `study/share_card.py`.
+- Round 7 in the study: build I measured again on omp 18.22.0, with and without Codex named in the prompt, with the
+  main session at `auto`, and with only the agents installed. The README gains a table of the saving per omp
+  version; `data/runs.csv` gains `omp_version` and 35 rows.
+
+### Fixed
+
+- The omp version of the measurements: rounds 3 to 6 ran in 18.21.0, not 18.20.3.
+
+### Changed
+
+- `study/run_study.sh` stores the omp version with every run and refuses a no-skill run while the skill's agents
+  are installed for the user.
 
 ## [2.6.1] - 2026-11-16
 
