@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blind ranking</title>
+<style>
+  :root { --bg:#f6f5f2; --ink:#1d1d1b; --mute:#6b6a66; --line:#d9d7d0; --acc:#1f5f7a; --ok:#2e7d4f; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:15px/1.45 system-ui, sans-serif; background:var(--bg); color:var(--ink); }
+  header { display:flex; gap:16px; align-items:center; padding:12px 20px; border-bottom:1px solid var(--line); background:#fff; position:sticky; top:0; z-index:2; flex-wrap:wrap; }
+  header h1 { font-size:16px; margin:0; }
+  #nav { display:flex; gap:6px; flex-wrap:wrap; }
+  #nav button { border:1px solid var(--line); background:#fff; border-radius:6px; padding:4px 10px; cursor:pointer; font:inherit; }
+  #nav button.cur { border-color:var(--acc); outline:2px solid var(--acc); }
+  #nav button.done::after { content:" \2713"; color:var(--ok); }
+  main { padding:20px; max-width:1700px; margin:0 auto; }
+  h2 { margin:0 0 4px; font-size:20px; }
+  .hint { color:var(--mute); margin:0 0 16px; }
+  #cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:16px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:10px; padding:12px; display:flex; flex-direction:column; gap:10px; }
+  .card.sel { border-color:var(--acc); box-shadow:0 0 0 2px var(--acc); }
+  .card .lab { font-size:28px; font-weight:700; }
+  .card img { width:100%; height:auto; border:1px solid var(--line); border-radius:4px; background:#eee; }
+  .card pre { margin:0; max-height:420px; overflow:auto; white-space:pre-wrap; word-wrap:break-word; font:13px/1.5 ui-monospace, Menlo, monospace; background:#faf9f6; border:1px solid var(--line); border-radius:4px; padding:10px; }
+  .open { align-self:flex-start; padding:7px 12px; border:1px solid var(--acc); background:#fff; color:var(--acc); border-radius:6px; cursor:pointer; font:inherit; text-decoration:none; }
+  .ranks { display:flex; gap:6px; }
+  .ranks label { flex:1; }
+  .ranks input { position:absolute; opacity:0; }
+  .ranks span { display:block; text-align:center; padding:8px 0; border:1px solid var(--line); border-radius:6px; cursor:pointer; font-weight:600; }
+  .ranks input:checked + span { background:var(--acc); color:#fff; border-color:var(--acc); }
+  .ranks input:focus-visible + span { outline:2px solid #000; outline-offset:2px; }
+  .note { width:100%; padding:6px 8px; border:1px solid var(--line); border-radius:6px; font:inherit; }
+  #bar { margin-top:20px; display:flex; gap:12px; align-items:center; }
+  #save { padding:10px 18px; background:var(--acc); color:#fff; border:0; border-radius:8px; font:inherit; font-weight:600; cursor:pointer; }
+  #save:disabled { background:#aab; cursor:not-allowed; }
+  #msg { color:var(--mute); }
+  #msg.err { color:#b3261e; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Blind ranking</h1>
+  <div id="nav"></div>
+  <span id="count" class="hint" style="margin:0"></span>
+</header>
+<main>
+  <h2 id="title"></h2>
+  <p class="hint">Rank every option: 1 is best, 5 is worst, ties allowed. Keys: a letter (A to E) picks a card, then 1 to 5 sets its rank. Enter saves when all are ranked.</p>
+  <div id="cards"></div>
+  <div id="bar"><button id="save" disabled>Save and next</button><span id="msg"></span></div>
+</main>
+<script>
+let screens = [], cur = null, detail = null, sel = null;
+const $ = (id) => document.getElementById(id);
+
+async function api(path, opts) {
+  const r = await fetch(path, opts);
+  const j = await r.json();
+  if (!r.ok) throw new Error(j.error || r.statusText);
+  return j;
+}
+
+async function loadList() {
+  screens = await api('/api/screens');
+  $('nav').replaceChildren(...screens.map((s, i) => {
+    const b = document.createElement('button');
+    b.textContent = String(i + 1);
+    b.title = s.brief_title;
+    if (s.done) b.className = 'done';
+    if (s.id === cur) b.className += ' cur';
+    b.onclick = () => open(s.id);
+    return b;
+  }));
+  $('count').textContent = screens.filter((s) => s.done).length + ' of ' + screens.length + ' done';
+}
+
+async function open(id) {
+  cur = id;
+  detail = await api('/api/screen/' + encodeURIComponent(id));
+  $('title').textContent = detail.brief_title;
+  const saved = Object.assign({ ranks: {}, notes: {}, use: {} }, detail.saved || {});
+  const cards = detail.items.map((it) => {
+    const c = document.createElement('div');
+    c.className = 'card';
+    c.dataset.label = it.label;
+    const lab = document.createElement('div');
+    lab.className = 'lab';
+    lab.textContent = it.label;
+    c.append(lab);
+    if (it.kind === 'html') {
+      if (it.strip_url) {
+        const img = document.createElement('img');
+        img.src = it.strip_url;
+        img.alt = 'Option ' + it.label + ' frames';
+        c.append(img);
+      }
+      const a = document.createElement('a');
+      a.className = 'open';
+      a.href = it.open_url;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = 'Open live in new tab';
+      c.append(a);
+    } else {
+      const pre = document.createElement('pre');
+      pre.textContent = it.text;
+      c.append(pre);
+    }
+    const rk = document.createElement('div');
+    rk.className = 'ranks';
+    for (let n = 1; n <= 5; n++) {
+      const l = document.createElement('label');
+      const i = document.createElement('input');
+      i.type = 'radio'; i.name = 'rank-' + it.label; i.value = n;
+      if (saved.ranks[it.label] === n) i.checked = true;
+      i.onchange = update;
+      i.onfocus = () => select(it.label);
+      const s = document.createElement('span');
+      s.textContent = n;
+      l.append(i, s);
+      rk.append(l);
+    }
+    const note = document.createElement('input');
+    note.className = 'note'; note.type = 'text'; note.placeholder = 'Optional one-line note';
+    note.maxLength = 300; note.value = saved.notes[it.label] || '';
+    note.dataset.label = it.label;
+    note.onfocus = () => select(it.label);
+    const use = document.createElement('select');
+    use.className = 'use'; use.dataset.label = it.label;
+    for (const [v, t] of [['', 'Would you use it?'], ['yes', 'Yes, as it is'], ['fix', 'Yes, after small fixes'], ['no', 'No']]) {
+      const o = document.createElement('option');
+      o.value = v; o.textContent = t;
+      if ((saved.use[it.label] || '') === v) o.selected = true;
+      use.append(o);
+    }
+    use.onchange = update;
+    use.style.cssText = 'width:100%;margin:6px 0;padding:6px;font:inherit';
+    c.append(rk, use, note);
+    return c;
+  });
+  $('cards').replaceChildren(...cards);
+  $('msg').textContent = detail.saved ? 'Saved earlier. Saving again overwrites it.' : '';
+  $('msg').className = '';
+  sel = null;
+  update();
+  loadList();
+  window.scrollTo(0, 0);
+}
+
+function ranks() {
+  const r = {};
+  for (const it of detail.items) {
+    const c = document.querySelector('input[name="rank-' + it.label + '"]:checked');
+    if (c) r[it.label] = Number(c.value);
+  }
+  return r;
+}
+
+function update() {
+  const marked = [...document.querySelectorAll('.use')].every((u) => u.value);
+  $('save').disabled = Object.keys(ranks()).length !== detail.items.length || !marked;
+}
+
+function select(label) {
+  sel = label;
+  document.querySelectorAll('.card').forEach((c) => c.classList.toggle('sel', c.dataset.label === label));
+}
+
+async function save() {
+  if ($('save').disabled) return;
+  const notes = {};
+  document.querySelectorAll('.note').forEach((n) => { if (n.value.trim()) notes[n.dataset.label] = n.value.trim(); });
+  try {
+    await api('/api/save/' + encodeURIComponent(cur), {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ranks: ranks(), notes, use: Object.fromEntries([...document.querySelectorAll('.use')].map((u) => [u.dataset.label, u.value])) }),
+    });
+  } catch (e) {
+    $('msg').textContent = 'Save failed: ' + e.message; $('msg').className = 'err'; return;
+  }
+  await loadList();
+  const idx = screens.findIndex((s) => s.id === cur);
+  const next = screens.slice(idx + 1).concat(screens.slice(0, idx)).find((s) => !s.done);
+  if (next) open(next.id);
+  else { $('msg').textContent = 'Saved. All screens are done.'; $('msg').className = ''; }
+}
+
+$('save').onclick = save;
+document.addEventListener('keydown', (e) => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const typing = e.target.tagName === 'INPUT' && e.target.type === 'text';
+  if (e.key === 'Enter') { if (!$('save').disabled) { e.preventDefault(); save(); } return; }
+  if (typing) return;
+  const k = e.key.toUpperCase();
+  if (detail && /^[A-E]$/.test(k) && detail.items.some((i) => i.label === k)) { select(k); return; }
+  if (sel && /^[1-5]$/.test(e.key)) {
+    const i = document.querySelector('input[name="rank-' + sel + '"][value="' + e.key + '"]');
+    if (i) { i.checked = true; update(); }
+  }
+});
+
+(async () => {
+  await loadList();
+  const first = screens.find((s) => !s.done) || screens[0];
+  if (first) open(first.id);
+})();
+</script>
+</body>
+</html>

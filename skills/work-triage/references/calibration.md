@@ -81,6 +81,22 @@ Where the cheap settings failed:
    rank-sum p = 0.0079), hidden test 5/5 and 5/5, major defects after blind grading 15 against 14. Round 6
    (skill 2.6, build I): median $4.58 against $7.76, −41.1 %, p = 0.0079, hidden test 5/5 and 5/5, major defects
    17 against 27 (Python 3.12). Hence section 2 of SKILL.md: a parent at `high`, few batched workers, one review.
+   Both ran in omp 18.21.0. Round 7 measured build I again in omp 18.22.0, which by itself runs subagents at lower
+   levels: $4.25 against $5.91 (−28.0 %, p = 0.0159) with Codex named in the prompt, $4.28 against $6.43 (−33.5 %,
+   p = 0.0040) with none, hidden test 5/5 everywhere, no defects graded. The saving belongs to a harness version;
+   measure again after an update.
+9. **Study, design built in code** (2026-11-17; six briefs: title sequence, landing page, 3D scene, logo sting,
+   pricing page, and launch copy; three runs per setup; outputs ranked blind and marked "would you hand it to a
+   client" by two model judges, Opus 5.5 `high` and `gpt-6-astra` `high`; no person judged). Usable on the five
+   design briefs (both judges yes or fix), of 15 outputs: Sonnet `high` 13, Opus `medium` 8, Opus `high` 14,
+   Fable `high` 15. Median cost per run by brief: Sonnet `high` $0.12 to $0.62, Opus `medium` $0.37 to $1.72, Opus
+   `high` $0.61 to $2.72, Fable `high` $2.53 to $12.79. Mean rank over all 18 screens (1 = best of five): Fable
+   1.33 and 1.94 (Opus judge, astra judge), Opus `high` 2.83 and 2.33, Sonnet `high` 3.67 and 3.78, Opus `medium`
+   4.44 and 4.17. The second round fixed its bars in advance: "Sonnet `high` first" held (6 of 6 usable), "never
+   Opus `medium`" held, "Opus `high` is needed to be right the first time" did not (Sonnet was as often usable),
+   "Fable directs, Sonnet builds" did not (62 % of Fable's cost against a bar of 60 %, and one judge ranked it a
+   full place behind). The two judges agree only moderately (Kendall tau-b 0.65 and 0.37), and the copy brief
+   could not be read: one judge rejected most copy of every setup for claims beyond the fact sheet.
 
 ## What the calibration benchmark does not show
 

@@ -6,6 +6,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [2.7.0] - 2026-11-17
+
+### Changed
+
+- Design built in code (pages, motion, 3D scenes) goes to Sonnet 5.5 `high`, to Opus 5.5 `high` for a better result
+  at three to five times the price, never to Opus `medium`, and to Fable 5.2 only when the best possible result is
+  asked for. From 90 runs on six creative briefs judged blind by two models; see the study.
+
 ### Added
 
 - A share card at the top of the README (`study/charts/share-card-*.svg`, `share-card.png`), drawn from
