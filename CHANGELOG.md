@@ -6,6 +6,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Changed
+
+- README rebuilt: a 15-second summary at the top, one evidence table with every measurement, a "Who gets what"
+  picture with Codex and the escalation ladder in place of the flowchart, a chart for the creative part.
+
+### Added
+
+- A 36-second film (`study/film/`, 16:9 and 4:5, with voice-over) and a silent preview loop at the top of the README.
+
 ## [2.7.0] - 2026-11-17
 
 ### Changed

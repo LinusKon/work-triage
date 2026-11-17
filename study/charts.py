@@ -266,11 +266,81 @@ def small_chart(runs, theme, path):
     s.save(path)
 
 
+def routing_chart(theme, path):
+    """Who gets which work in skill 2.7: the main session, the rows, Codex, and the ladder upward."""
+    h = 700  # main card, six rows of 52, ladder card, source line
+    s = Svg(h, theme, "Who gets what", "Work that fits one session stays there. Larger work is split like this.")
+    s.card(28, 84, W - 56, 92)
+    s.text(52, 116, "Main session", 15, weight="650")
+    s.pill(52 + 118, 112, "Opus 5.5 · high", "skill", "start", 12)
+    s.text(52, 146, "Plans, writes the shared contract, integrates, runs the whole suite once. Never lowered.", 13, "muted")
+    s.line(W / 2, 176, W / 2, 196, "grid", 2)
+    rows = (
+        ("Spec'd modules, tests, docs", "wt-worker", "Sonnet 5.5 · medium", "sonnet", "measured on two builds"),
+        ("Dense edge cases, design built in code", "wt-worker-hard", "Sonnet 5.5 · high", "sonnet",
+         "builds and six creative briefs"),
+        ("Copy, image and video prompts", "per call", "Opus 5.5 · medium", "base", "rule, not measured"),
+        ("Security, secrets, an open interface", "floor", "Opus 5.5 · high", "skill", "never cheaper"),
+        ("One review of the merged result", "wt-reviewer", "Opus 5.5 · high", "skill", "measured on two builds"),
+        ("Codex, when you work with it", "model named", "sol: modules · terra: app checks", "codex",
+         "a Codex review only on request"),
+    )
+    top, rh = 196, 52
+    s.card(28, top, W - 56, rh * len(rows) + 16)
+    for i, (work, who, model, color, note) in enumerate(rows):
+        y = top + 34 + i * rh
+        if i:
+            s.line(48, y - 26, W - 48, y - 26, "grid", 1)
+        s.text(52, y, work, 13.5, weight="600")
+        s.text(52, y + 17, note, 11.5, "faint")
+        s.text(470, y + 4, who, 12.5, "muted", mono=True)
+        s.pill(W - 52, y, model, color, "end", 12)
+    ly = top + rh * len(rows) + 16 + 24
+    s.card(28, ly, W - 56, 104)
+    s.text(52, ly + 30, "When a check fails twice, the work moves one step up", 14, weight="650")
+    steps = ("wt-worker", "wt-worker-hard", "Opus high", "Opus xhigh", "Fable 5.2")
+    sw = (W - 104) / len(steps)
+    for i, name in enumerate(steps):
+        x = 52 + sw * i
+        s.rect(x, ly + 50, sw - 22, 34, "card", 1.0, 8, "grid")
+        s.text(x + (sw - 22) / 2, ly + 72, name, 12.5, "fg", "middle", "600", mono=True)
+        if i < len(steps) - 1:
+            s.text(x + sw - 11, ly + 72, "→", 15, "faint", "middle")
+    s.note("Source: skills/work-triage/SKILL.md, version 2.7.0. Security stops at Opus xhigh, then the user decides.")
+    s.save(path)
+
+
+def creative_chart(creative, theme, path):
+    """Design built in code: usable outputs of 15 and cost per usable output, per model (two model judges)."""
+    setups = (("sonnet-high", "Sonnet 5.5 · high", "sonnet"), ("opus-medium", "Opus 5.5 · medium", "base"),
+              ("opus-high", "Opus 5.5 · high", "skill"), ("fable-high", "Fable 5.2 · high", "codex"))
+    rows = [r for r in creative if r["brief"] != "copy"]
+    h = 330
+    s = Svg(h, theme, "Design built in code: when is a cheaper model enough?",
+            "Five briefs, three runs each. Usable = both model judges would hand it to a client.")
+    s.card(28, 84, W - 56, h - 84 - 40)
+    s.text(52, 116, "usable outputs of 15", 12, "muted")
+    s.text(W - 52, 116, "$ per usable output", 12, "muted", "end")
+    for i, (key, label, color) in enumerate(setups):
+        mine = [r for r in rows if r["setup"] == key]
+        ok = [r for r in mine if r["use_opus"] in ("yes", "fix") and r["use_astra"] in ("yes", "fix")]
+        per = sum(float(r["total_usd"]) for r in mine) / len(ok) if ok else 0
+        y = 150 + i * 38
+        s.text(52, y + 5, label, 13.5, weight="600")
+        for k in range(len(mine)):
+            s.rect(240 + k * 22, y - 9, 16, 16, color if k < len(ok) else "grid", 1.0 if k < len(ok) else 0.6, 3)
+        s.text(240 + len(mine) * 22 + 10, y + 5, "%d" % len(ok), 13, color, "start", "650")
+        s.text(W - 52, y + 5, "$%.2f" % per, 14, "fg", "end", "650", mono=True)
+    s.note("Source: study/data/creative.csv. Judged by Opus 5.5 high and gpt-6-astra high, blind; no person judged.")
+    s.save(path)
+
+
 def main():
     data, out = sys.argv[1], sys.argv[2]
     os.makedirs(out, exist_ok=True)
     runs = load(os.path.join(data, "runs.csv"))
     defects = load(os.path.join(data, "defects.csv")) if os.path.exists(os.path.join(data, "defects.csv")) else []
+    creative = load(os.path.join(data, "creative.csv")) if os.path.exists(os.path.join(data, "creative.csv")) else []
     builds = [b for b in (("5", "H", "skill25", "Build H · dataops", "20 plug-in operations · skill 2.5"),
                           ("6", "I", "skill26", "Build I · tasktrack", "layered task tracker · skill 2.6"))
               if pick(runs, round=b[0], task=b[1], arm=b[2])]
@@ -288,6 +358,9 @@ def main():
         small_chart(runs, theme, os.path.join(out, "small-tasks-%s.svg" % theme))
         if defects:
             defect_chart(defects, builds, theme, os.path.join(out, "defects-%s.svg" % theme))
+        routing_chart(theme, os.path.join(out, "routing-%s.svg" % theme))
+        if creative:
+            creative_chart(creative, theme, os.path.join(out, "creative-%s.svg" % theme))
     print("charts ->", out)
 
 

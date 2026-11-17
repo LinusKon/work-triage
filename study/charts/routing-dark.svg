@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 700" width="880" height="700" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" role="img">
+<text x="28.0" y="38.0" font-size="20" fill="#f0f6fc" text-anchor="start" font-weight="650">Who gets what</text>
+<text x="28.0" y="62.0" font-size="13.5" fill="#9198a1" text-anchor="start" font-weight="400">Work that fits one session stays there. Larger work is split like this.</text>
+<rect x="28.0" y="84.0" width="824.0" height="92.0" rx="10" fill="#151b23" fill-opacity="1.00" stroke="#30363d" stroke-width="1"/>
+<text x="52.0" y="116.0" font-size="15" fill="#f0f6fc" text-anchor="start" font-weight="650">Main session</text>
+<rect x="170.0" y="97.0" width="122.6" height="22.0" rx="11" fill="#ab7df8" fill-opacity="1.00"/>
+<text x="231.3" y="112.0" font-size="12" fill="#0d1117" text-anchor="middle" font-weight="650">Opus 5.5 · high</text>
+<text x="52.0" y="146.0" font-size="13" fill="#9198a1" text-anchor="start" font-weight="400">Plans, writes the shared contract, integrates, runs the whole suite once. Never lowered.</text>
+<line x1="440.0" y1="176.0" x2="440.0" y2="196.0" stroke="#30363d" stroke-width="2" stroke-linecap="butt"/>
+<rect x="28.0" y="196.0" width="824.0" height="328.0" rx="10" fill="#151b23" fill-opacity="1.00" stroke="#30363d" stroke-width="1"/>
+<text x="52.0" y="230.0" font-size="13.5" fill="#f0f6fc" text-anchor="start" font-weight="600">Spec'd modules, tests, docs</text>
+<text x="52.0" y="247.0" font-size="11.5" fill="#6e7681" text-anchor="start" font-weight="400">measured on two builds</text>
+<text x="470.0" y="234.0" font-size="12.5" fill="#9198a1" text-anchor="start" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">wt-worker</text>
+<rect x="677.0" y="215.0" width="151.0" height="22.0" rx="11" fill="#3fb950" fill-opacity="1.00"/>
+<text x="752.5" y="230.0" font-size="12" fill="#0d1117" text-anchor="middle" font-weight="650">Sonnet 5.5 · medium</text>
+<line x1="48.0" y1="256.0" x2="832.0" y2="256.0" stroke="#30363d" stroke-width="1" stroke-linecap="butt"/>
+<text x="52.0" y="282.0" font-size="13.5" fill="#f0f6fc" text-anchor="start" font-weight="600">Dense edge cases, design built in code</text>
+<text x="52.0" y="299.0" font-size="11.5" fill="#6e7681" text-anchor="start" font-weight="400">builds and six creative briefs</text>
+<text x="470.0" y="286.0" font-size="12.5" fill="#9198a1" text-anchor="start" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">wt-worker-hard</text>
+<rect x="691.2" y="267.0" width="136.8" height="22.0" rx="11" fill="#3fb950" fill-opacity="1.00"/>
+<text x="759.6" y="282.0" font-size="12" fill="#0d1117" text-anchor="middle" font-weight="650">Sonnet 5.5 · high</text>
+<line x1="48.0" y1="308.0" x2="832.0" y2="308.0" stroke="#30363d" stroke-width="1" stroke-linecap="butt"/>
+<text x="52.0" y="334.0" font-size="13.5" fill="#f0f6fc" text-anchor="start" font-weight="600">Copy, image and video prompts</text>
+<text x="52.0" y="351.0" font-size="11.5" fill="#6e7681" text-anchor="start" font-weight="400">rule, not measured</text>
+<text x="470.0" y="338.0" font-size="12.5" fill="#9198a1" text-anchor="start" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">per call</text>
+<rect x="691.2" y="319.0" width="136.8" height="22.0" rx="11" fill="#768390" fill-opacity="1.00"/>
+<text x="759.6" y="334.0" font-size="12" fill="#0d1117" text-anchor="middle" font-weight="650">Opus 5.5 · medium</text>
+<line x1="48.0" y1="360.0" x2="832.0" y2="360.0" stroke="#30363d" stroke-width="1" stroke-linecap="butt"/>
+<text x="52.0" y="386.0" font-size="13.5" fill="#f0f6fc" text-anchor="start" font-weight="600">Security, secrets, an open interface</text>
+<text x="52.0" y="403.0" font-size="11.5" fill="#6e7681" text-anchor="start" font-weight="400">never cheaper</text>
+<text x="470.0" y="390.0" font-size="12.5" fill="#9198a1" text-anchor="start" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">floor</text>
+<rect x="705.4" y="371.0" width="122.6" height="22.0" rx="11" fill="#ab7df8" fill-opacity="1.00"/>
+<text x="766.7" y="386.0" font-size="12" fill="#0d1117" text-anchor="middle" font-weight="650">Opus 5.5 · high</text>
+<line x1="48.0" y1="412.0" x2="832.0" y2="412.0" stroke="#30363d" stroke-width="1" stroke-linecap="butt"/>
+<text x="52.0" y="438.0" font-size="13.5" fill="#f0f6fc" text-anchor="start" font-weight="600">One review of the merged result</text>
+<text x="52.0" y="455.0" font-size="11.5" fill="#6e7681" text-anchor="start" font-weight="400">measured on two builds</text>
+<text x="470.0" y="442.0" font-size="12.5" fill="#9198a1" text-anchor="start" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">wt-reviewer</text>
+<rect x="705.4" y="423.0" width="122.6" height="22.0" rx="11" fill="#ab7df8" fill-opacity="1.00"/>
+<text x="766.7" y="438.0" font-size="12" fill="#0d1117" text-anchor="middle" font-weight="650">Opus 5.5 · high</text>
+<line x1="48.0" y1="464.0" x2="832.0" y2="464.0" stroke="#30363d" stroke-width="1" stroke-linecap="butt"/>
+<text x="52.0" y="490.0" font-size="13.5" fill="#f0f6fc" text-anchor="start" font-weight="600">Codex, when you work with it</text>
+<text x="52.0" y="507.0" font-size="11.5" fill="#6e7681" text-anchor="start" font-weight="400">a Codex review only on request</text>
+<text x="470.0" y="494.0" font-size="12.5" fill="#9198a1" text-anchor="start" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">model named</text>
+<rect x="584.7" y="475.0" width="243.3" height="22.0" rx="11" fill="#d29922" fill-opacity="1.00"/>
+<text x="706.3" y="490.0" font-size="12" fill="#0d1117" text-anchor="middle" font-weight="650">sol: modules · terra: app checks</text>
+<rect x="28.0" y="548.0" width="824.0" height="104.0" rx="10" fill="#151b23" fill-opacity="1.00" stroke="#30363d" stroke-width="1"/>
+<text x="52.0" y="578.0" font-size="14" fill="#f0f6fc" text-anchor="start" font-weight="650">When a check fails twice, the work moves one step up</text>
+<rect x="52.0" y="598.0" width="133.2" height="34.0" rx="8" fill="#151b23" fill-opacity="1.00" stroke="#30363d" stroke-width="1"/>
+<text x="118.6" y="620.0" font-size="12.5" fill="#f0f6fc" text-anchor="middle" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">wt-worker</text>
+<text x="196.2" y="620.0" font-size="15" fill="#6e7681" text-anchor="middle" font-weight="400">→</text>
+<rect x="207.2" y="598.0" width="133.2" height="34.0" rx="8" fill="#151b23" fill-opacity="1.00" stroke="#30363d" stroke-width="1"/>
+<text x="273.8" y="620.0" font-size="12.5" fill="#f0f6fc" text-anchor="middle" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">wt-worker-hard</text>
+<text x="351.4" y="620.0" font-size="15" fill="#6e7681" text-anchor="middle" font-weight="400">→</text>
+<rect x="362.4" y="598.0" width="133.2" height="34.0" rx="8" fill="#151b23" fill-opacity="1.00" stroke="#30363d" stroke-width="1"/>
+<text x="429.0" y="620.0" font-size="12.5" fill="#f0f6fc" text-anchor="middle" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">Opus high</text>
+<text x="506.6" y="620.0" font-size="15" fill="#6e7681" text-anchor="middle" font-weight="400">→</text>
+<rect x="517.6" y="598.0" width="133.2" height="34.0" rx="8" fill="#151b23" fill-opacity="1.00" stroke="#30363d" stroke-width="1"/>
+<text x="584.2" y="620.0" font-size="12.5" fill="#f0f6fc" text-anchor="middle" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">Opus xhigh</text>
+<text x="661.8" y="620.0" font-size="15" fill="#6e7681" text-anchor="middle" font-weight="400">→</text>
+<rect x="672.8" y="598.0" width="133.2" height="34.0" rx="8" fill="#151b23" fill-opacity="1.00" stroke="#30363d" stroke-width="1"/>
+<text x="739.4" y="620.0" font-size="12.5" fill="#f0f6fc" text-anchor="middle" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">Fable 5.2</text>
+<text x="28.0" y="686.0" font-size="11" fill="#6e7681" text-anchor="start" font-weight="400">Source: skills/work-triage/SKILL.md, version 2.7.0. Security stops at Opus xhigh, then the user decides.</text>
+</svg>
