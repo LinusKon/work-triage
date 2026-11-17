@@ -2,9 +2,12 @@
 """Write one CSV row per study run from the local run folders: export_data.py <study dir> <out.csv>.
 
 Rounds are told apart by folder (`runs-v1` … `runs`); costs are re-collected with collect.py so that every round
-carries Codex at list prices. No paths, prompts or session content are written.
+carries Codex at list prices. Round 7 is the re-measurement on a newer omp (arms in `ROUND7`). The omp version is
+read from each run's session file. No paths, prompts or session content are written.
 """
 import csv
+import glob
+import json
 import os
 import sys
 
@@ -12,12 +15,35 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import collect  # noqa: E402
 
 VERSIONS = {"base": "", "basemed": "", "basespawn": "", "skill201": "2.0.1", "skill21": "2.1.0", "skill22": "2.2.0",
-            "skill23": "2.3.0", "skill24": "2.4.0", "skill25": "2.5.0", "skill26": "2.6.0", "skill261": "2.6.1"}
-HEAD = {"basemed": "medium", "skill23": "medium"}
+            "skill23": "2.3.0", "skill24": "2.4.0", "skill25": "2.5.0", "skill26": "2.6.0", "skill261": "2.6.1",
+            "skill261v22": "2.6.1", "skill261nc": "2.6.1"}
+ROUND7 = {
+    "base22": "no skill, Codex named in the prompt",
+    "skill261v22": "skill, Codex named in the prompt; the skill's agents were installed for the user",
+    "base22nc": "no skill, prompt names no Codex",
+    "skill261nc": "skill, prompt names no Codex",
+    "autoclean": "no skill, main session at thinking level auto",
+    "agentshigh": "no skill text, but the skill's three agents installed for the user",
+    "baseauto": "no skill text, thinking level auto, the skill's three agents installed for the user (unplanned)",
+}
+HEAD = {"basemed": "medium", "skill23": "medium", "autoclean": "auto", "baseauto": "auto"}
 FOLDERS = [("runs-v1", 1), ("runs-v2", 2), ("runs-v3", 3), ("runs-v45", 5), ("runs", 6)]
-FIELDS = ["round", "task", "arm", "rep", "skill_version", "head_level", "total_usd", "claude_usd", "codex_usd",
-          "parent_usd", "claude_tokens", "codex_tokens", "wall_s", "spawns", "codex_runs", "hidden_passed",
+FIELDS = ["round", "task", "arm", "rep", "skill_version", "head_level", "omp_version", "total_usd", "claude_usd",
+          "codex_usd", "parent_usd", "claude_tokens", "codex_tokens", "wall_s", "spawns", "codex_runs", "hidden_passed",
           "hidden_tests", "sonnet_usd", "opus_usd", "note"]
+
+
+def omp_version(run):
+    """The omp version written into the run's main session file, or '' when it is not there."""
+    for path in sorted(glob.glob(os.path.join(run, "sessions", "*.jsonl"))):
+        with open(path, encoding="utf-8") as f:
+            for line in f:
+                if '"model_change"' in line:
+                    try:
+                        return json.loads(line).get("runtime", {}).get("version", "")
+                    except ValueError:
+                        return ""
+    return ""
 
 
 def rows(study):
@@ -44,6 +70,8 @@ def rows(study):
                 note = "regression check on build H, no reviews"
             if r["arm"] == "skill261":
                 note = "control run after the wording-only release 2.6.1, no reviews"
+            if r["arm"] in ROUND7:
+                rnd_here, note = 7, ROUND7[r["arm"]]
             key = (rnd_here, name)
             if key in seen:
                 continue
@@ -56,6 +84,7 @@ def rows(study):
             yield {
                 "round": rnd_here, "task": r["task"], "arm": r["arm"], "rep": r["rep"],
                 "skill_version": VERSIONS.get(r["arm"], ""), "head_level": HEAD.get(r["arm"], "high"),
+                "omp_version": omp_version(run),
                 "total_usd": "%.4f" % r["total_usd"], "claude_usd": "%.4f" % r["claude_usd"],
                 "codex_usd": "%.4f" % r["codex_usd"], "parent_usd": "%.4f" % r["parent_usd"],
                 "claude_tokens": r["claude_tokens"], "codex_tokens": r["codex_tokens"], "wall_s": r["wall_s"],

@@ -1,7 +1,8 @@
 # The study behind work-triage
 
-Does a triage skill make agent work cheaper without making it worse? Six rounds, 95 measured runs, nine tasks
-(`data/runs.csv` holds 98 rows: three more are control runs of the final wording).
+Does a triage skill make agent work cheaper without making it worse? Six rounds, 95 measured runs, nine tasks, and a
+seventh round of 35 runs that measured one large build again on a newer omp (`data/runs.csv` holds 133 rows: three
+more are control runs of the final wording).
 The short answer: **not on small tasks, yes on large builds**, and the skill had to be rebuilt five times to get
 there. This page has the method, the data and every round, including the rounds the skill lost. The calibration
 benchmark in [`skills/work-triage/references/calibration.md`](../skills/work-triage/references/calibration.md) is
@@ -22,7 +23,8 @@ Every run follows the same protocol (`run_study.sh`):
 
 1. **One task, one fresh repository.** The task text is a fixed specification from [`tasks/`](tasks).
 2. **Arms differ by one line.** An arm is one setup under test: the skill or no skill (the baseline). Every arm is
-   the same model in the same harness (Opus 5.5 in omp 18.20.3, no context files, no installed skills) with the
+   the same model in the same harness (Opus 5.5 in omp, no context files, no installed skills; round 1 ran in omp
+   18.20.3, rounds 3 to 6 in 18.21.0, round 7 in 18.22.0, and every run's version is in `data/runs.csv`) with the
    same tools: subagents and the Codex CLI (OpenAI's coding agent). The skill arm's prompt starts with "Read the
    work-triage skill at … and follow it"; the baseline's does not. The saved prompts were compared.
 3. **A hidden acceptance test** ([`hidden-tests/`](hidden-tests)) runs after the session ends. No session saw it.
@@ -136,6 +138,37 @@ modules to the cheap Codex model in batches instead, at the same cost.
   on a number with more than 4,300 digits; one baseline build of H crashes on a list-valued join.
 - Neither arm is clean. One to six spec-edge defects per build got past the build's own tests and its review.
 
+## Round 7: the same build on a newer omp
+
+A day after round 6, omp had updated itself from 18.21.0 to 18.22.0. The new version gives subagents lower
+thinking levels on its own, so the no-skill baseline changed. Build I was run again, five runs per setup, on
+2026-11-17. No bar was fixed in advance; the setup is round 6's, and quality was checked by the hidden test only.
+
+| Setup (Opus 5.5 main session, omp 18.22.0) | Median total | Range | Median minutes | Hidden test |
+|---|---|---|---|---|
+| No skill, prompt names Codex | $5.91 | $4.42 to $6.73 | 12.4 | 5/5 |
+| Skill 2.6.1, prompt names Codex | $4.25 | $4.11 to $4.95 | 14.5 | 5/5 |
+| No skill, prompt names no Codex | $6.43 | $6.04 to $7.54 | 12.5 | 5/5 |
+| Skill 2.6.1, prompt names no Codex | $4.28 | $3.76 to $4.50 | 14.3 | 5/5 |
+| No skill, main session at thinking level `auto` | $6.39 | $5.10 to $8.04 | 13.6 | 5/5 |
+| No skill text, the skill's three agents installed for the user | $7.59 | $5.07 to $8.71 | 46.9 | 5/5 |
+| The same with the main session at `auto` (unplanned, see below) | $4.54 | $3.27 to $5.89 | 11.7 | 5/5 |
+
+- **With Codex named:** the skill costs a median 28.0 % less (exact one-sided rank-sum p = 0.0159). The baseline
+  bought a Codex review in four of five runs ($1.26 at list prices in the median); the skill bought none. In Claude
+  dollars alone the medians are $4.64 and $4.25.
+- **With no Codex named:** the skill costs a median 33.5 % less (p = 0.0040; every skill run was cheaper than every
+  baseline run). Without Codex the baseline reviews with Opus subagents at `high` and still runs nearly all workers
+  on Opus; the skill's workers run on Sonnet with one Opus review. This is the comparison for someone who uses
+  Claude only, and it shows that subtracting Codex dollars from the first comparison understates the saving.
+- **The baseline itself got cheaper:** $7.76 in omp 18.21.0, $5.91 in 18.22.0, same prompt. A saving measured in
+  one version does not carry to the next; each version needs its own row.
+- **Thinking level `auto` saved nothing here:** $6.39 against $5.91 at `high`, ranges overlapping.
+- **The agents without the skill's text do not do the job.** With the three agents installed for the user and the
+  main session at `high`, the baseline used them but cost more and took almost four times as long. The cheap result
+  in the last row happened only together with `auto`; those five runs were meant as a plain `auto` baseline and
+  picked up the agents because they had been installed that morning. They are reported, not used for a claim.
+
 ## Limits
 
 - Two large builds, both Python, both specified in detail by the skill's authors, each small enough that one
@@ -151,13 +184,14 @@ modules to the cheap Codex model in batches instead, at the same cost.
 - The published skill is 2.6.1, which changes wording only (the three agent files are identical to 2.6.0). Three
   control runs of 2.6.1 on build I cost $3.64, $3.99 and $4.38 and passed the hidden test; their defects were not
   graded.
-- The study cost about $253 in model usage, which is why the cells are small.
+- The study cost about $428 in Claude usage ($253 for rounds 1 to 6 and the controls, $175 for round 7), which is
+  why the cells are small.
 
 ## Files
 
 | Path | Content |
 |---|---|
-| [`data/runs.csv`](data/runs.csv) | One row per run: round, task, arm, skill version, total, Claude and Codex dollars, main-session dollars, tokens, wall time, spawns, hidden-test result, Sonnet and Opus dollars |
+| [`data/runs.csv`](data/runs.csv) | One row per run: round, task, arm, skill version, main-session level, omp version, total, Claude and Codex dollars, main-session dollars, tokens, wall time, spawns, hidden-test result, Sonnet and Opus dollars, note |
 | [`data/defects.csv`](data/defects.csv), [`data/defect-kinds.csv`](data/defect-kinds.csv) | Defects per run and per kind for the two large builds |
 | [`charts/`](charts) | Every chart, drawn by `charts.py` from the CSV files, in a light and a dark variant |
 | [`tasks/`](tasks) | The nine specifications; `F.seed/` is the seeded repository of task F |
