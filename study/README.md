@@ -169,6 +169,52 @@ thinking levels on its own, so the no-skill baseline changed. Build I was run ag
   in the last row happened only together with `auto`; those five runs were meant as a plain `auto` baseline and
   picked up the agents because they had been installed that morning. They are reported, not used for a claim.
 
+## Design built in code: which model, judged blind by two models
+
+The builds above are spec'd code with tests. This part asks a different question: for creative work that ends in
+code, does a stronger model give a visibly better result, and from where is the strongest one needed? No skill is
+involved; each setup gets the same brief in a fresh folder.
+
+- **Briefs** ([`creative/tasks/`](creative/tasks)): a ten-second title sequence, a landing page, a three.js scene
+  and launch copy (first round); a six-second logo sting and a pricing page (second round, with bars fixed in
+  advance). Each has hard requirements a script checks (it renders, no console errors, no network, the copy is
+  there, the animation is a pure function of time).
+- **Setups,** three runs per brief: Sonnet 5.5 `high`, Opus 5.5 `medium`, Opus 5.5 `high`, Fable 5.2 `high`, each
+  alone, and a fifth setup in which a strong model writes the direction and critiques once while a Sonnet `high`
+  worker builds (Opus directing in the first round, Fable in the second). 90 runs.
+- **Judging:** per brief and repetition the five outputs are shown under shuffled labels, without model names, to
+  two model judges (Opus 5.5 `high` and `gpt-6-astra` `high`), which see rendered frames and the brief. Each ranks
+  the five and, separately, answers for each output "would you hand it to a client": yes, after small fixes, or
+  no. **No person judged these outputs.** An output counts as usable when both judges say yes or fix.
+
+| Setup | Usable on the five design briefs (of 15) | Median cost per run, by brief | Mean rank, Opus judge | Mean rank, astra judge |
+|---|---|---|---|---|
+| Sonnet 5.5 `high` | 13 | $0.12 to $0.62 | 3.67 | 3.78 |
+| Opus 5.5 `medium` | 8 | $0.37 to $1.72 | 4.44 | 4.17 |
+| Opus 5.5 `high` | 14 | $0.61 to $2.72 | 2.83 | 2.33 |
+| Fable 5.2 `high` | 15 | $2.53 to $12.79 | 1.33 | 1.94 |
+
+Ranks are over all 18 screens (1 = best of five). Every output is in [`data/creative.csv`](data/creative.csv).
+
+- **Fable is ranked best and is rarely needed for a usable result.** It costs four to twelve times Opus `high`.
+- **Sonnet `high` is usable nearly as often as Opus `high`** at a fifth to a third of the price; both judges rank
+  Opus `high` about a place better.
+- **Opus `medium` is the worst choice here:** ranked last by both judges and usable in 8 of 15, at a higher price
+  than Sonnet `high`. The skill used to send "taste" to Opus `medium`; for design built in code that rule is gone.
+- **A strong director with a cheap builder earned no rule.** With Opus directing, it saved 10 % against Opus
+  alone and failed on the 3D scene. With Fable directing, it cost 62 % of Fable alone (the bar was 60 %) and the
+  two judges disagreed on its rank by a full place.
+- **The second round's bars:** "Sonnet `high` first" held (6 of 6 usable) and "never Opus `medium`" held. "Opus
+  `high` is needed to be right the first time" did not: Sonnet was usable as often.
+- **How far this carries:** the judges agree with each other only moderately (Kendall tau-b 0.65 in the first
+  round, 0.37 in the second), one judge is of the same model family as the setups, three runs per cell are few,
+  and the copy brief could not be read (one judge rejected most copy from every setup for claims beyond the fact
+  sheet). Treat the table as two models' opinion with the method shown, not as taste settled.
+
+A side test ([`planner_bias.py`](planner_bias.py)): asked to give every step of four plans "the cheapest model
+that will do it well", neither Opus nor `gpt-6-astra` reached higher for its own family; both went below the
+floor on security and interface steps (Opus 9 times, astra 17). Floors are there for that.
+
 ## Limits
 
 - Two large builds, both Python, both specified in detail by the skill's authors, each small enough that one
@@ -181,17 +227,19 @@ thinking levels on its own, so the no-skill baseline changed. Build I was run ag
 - The skill is slower.
 - Build H's main result belongs to skill 2.5. Three runs of 2.6 on H cost $3.88, $4.01 and $4.24 and passed the
   hidden test; their defects were not graded.
-- The published skill is 2.6.1, which changes wording only (the three agent files are identical to 2.6.0). Three
-  control runs of 2.6.1 on build I cost $3.64, $3.99 and $4.38 and passed the hidden test; their defects were not
-  graded.
-- The study cost about $428 in Claude usage ($253 for rounds 1 to 6 and the controls, $175 for round 7), which is
-  why the cells are small.
+- The skill measured on builds is 2.6.1, which changed wording only against 2.6.0 (the three agent files are
+  identical). Three control runs of 2.6.1 on build I cost $3.64, $3.99 and $4.38 and passed the hidden test; their
+  defects were not graded. 2.7.0 changes one routing line, for design built in code, which no build exercised.
+- The study cost about $630 in Claude usage ($253 for rounds 1 to 6 and the controls, $175 for round 7, about $200
+  for the creative part), which is why the cells are small.
 
 ## Files
 
 | Path | Content |
 |---|---|
 | [`data/runs.csv`](data/runs.csv) | One row per run: round, task, arm, skill version, main-session level, omp version, total, Claude and Codex dollars, main-session dollars, tokens, wall time, spawns, hidden-test result, Sonnet and Opus dollars, note |
+| [`data/creative.csv`](data/creative.csv) | One row per creative output: brief, setup, cost, minutes, objective checks, both judges' rank and "would you hand it to a client" |
+| [`creative/`](creative) | The six briefs, the renderer and checks, the blind ranking page, the judge prompts and the analysis of the creative part; `run_creative.sh` runs one output |
 | [`data/defects.csv`](data/defects.csv), [`data/defect-kinds.csv`](data/defect-kinds.csv) | Defects per run and per kind for the two large builds |
 | [`charts/`](charts) | Every chart, drawn by `charts.py` from the CSV files, in a light and a dark variant |
 | [`tasks/`](tasks) | The nine specifications; `F.seed/` is the seeded repository of task F |

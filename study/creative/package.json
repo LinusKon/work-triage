@@ -1,0 +1,12 @@
+{
+  "name": "creative-study-tools",
+  "private": true,
+  "description": "Render, check and blind-rank tooling for the creative study",
+  "type": "module",
+  "dependencies": {
+    "puppeteer-core": "^25.16.0"
+  },
+  "devDependencies": {
+    "three": "^0.187.0"
+  }
+}

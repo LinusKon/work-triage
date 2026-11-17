@@ -20,8 +20,9 @@ The skill ships three agent definitions in its `agents/` folder:
 - Select one with the task item's `agent` field and leave `model` out. The file's frontmatter sets `model` and
   `thinking-level`, so the row runs on that model and level. These rows pass no `model`, so the preflight below
   does not apply to them.
-- Rows no agent fits name a per-call `model` with a level: Opus 5.5 `medium` for taste (copy, UI polish, image
-  and video prompts), Opus 5.5 `high` for floors. Never `effort`.
+- Rows no agent fits name a per-call `model` with a level: Opus 5.5 `high` for floors, Opus 5.5 `medium` for copy
+  and for image and video prompts. Design built in code goes to `wt-worker-hard` (Sonnet 5.5 `high`) or, for a
+  better result at a higher price, Opus 5.5 `high`; never Opus `medium` (SKILL.md section 2, item 3). Never `effort`.
 
 ## Terms
 

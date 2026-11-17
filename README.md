@@ -55,13 +55,15 @@ expensive as no skill at all.** What survived six rounds of measurement is small
 |---|---|
 | Spec'd modules, tests and docs | `wt-worker` (Sonnet 5.5 `medium`) |
 | The same with dense edge cases or an approach to choose | `wt-worker-hard` (Sonnet 5.5 `high`) |
-| Taste: copy, UI polish, image and video prompts | Opus 5.5 `medium`, named per call |
+| Design built in code: pages, motion, 3D scenes | Sonnet 5.5 `high`; Opus 5.5 `high` for a better result at three to five times the price; never Opus `medium`; Fable 5.2 only when the best possible result is asked for |
+| Copy, image and video prompts | Opus 5.5 `medium`, named per call (not measured) |
 | Floors: security, secrets, an interface still to decide | Opus 5.5 `high` |
 | One review of the merged result | `wt-reviewer` (Opus 5.5 `high`) |
 | The shared contract and the integration | the main session |
 
 The study's two large builds were spec'd Python code, so they exercised only the two Sonnet rows, the main session
-and the reviewer.
+and the reviewer. The design row comes from 90 runs on six creative briefs, judged blind by two models, not by a
+person (see the [study](study/README.md)).
 
 ```mermaid
 flowchart LR

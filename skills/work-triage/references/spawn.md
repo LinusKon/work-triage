@@ -51,11 +51,11 @@ section 1) gets the **lowest rung whose conditions it meets**, after floors, che
 | Rung | The row |
 |---|---|
 | `wt-worker` (Sonnet 5.5 `medium`) | what, where and how to check are written down; it chooses no approach; a mistake shows in a test or is cheap to spot; no floor, no taste: modules, CLIs, tests and docs to a spec, a bug with a failing test, search, log reading, transforms with a count or schema check, web research with links |
-| `wt-worker-hard` (Sonnet 5.5 `high`) | the same, dense with edge cases (parsers, number formats, rounding, time, concurrency) or with an approach to choose inside the spec |
-| Opus 5.5 `medium`, by per-call `model` | taste: concepts, copy, UI polish, prompts for image and video models, documents from more sources than the parent checks |
+| `wt-worker-hard` (Sonnet 5.5 `high`) | the same, dense with edge cases (parsers, number formats, rounding, time, concurrency) or with an approach to choose inside the spec; design built in code (pages, motion, 3D scenes) |
+| Opus 5.5 `medium`, by per-call `model` | taste in words: concepts, copy, prompts for image and video models, documents from more sources than the parent checks. Never design built in code (SKILL.md section 2, item 3) |
 | Opus 5.5 `high` | the parent's default; floors (security, secrets, an interface still to decide; SKILL.md section 3); judgment with no check; a row three or more later rows build on, with no check; the review, as `wt-reviewer` |
 | Opus 5.5 `xhigh` | edge-case-dense work no check covers (parsers, sanitisers, concurrency, billing, migration scripts on real data); a review that found a major issue or a risky path no test covers. Never a first attempt where a check exists |
-| Fable 5.2 (`high` alone, `medium` when the parent steers it) | only under SKILL.md section 2's condition: Opus `xhigh` failed with full context on cross-system architecture or root cause, or frontier-hard work beyond one context. Never security: its safeguards block most cyber tasks |
+| Fable 5.2 (`high` alone, `medium` when the parent steers it) | only under SKILL.md section 2's condition: Opus `xhigh` failed with full context on cross-system architecture or root cause, frontier-hard work beyond one context, or design when the user asks for the best possible result. Never security: its safeguards block most cyber tasks |
 
 Doubt about a row does not raise its rung; write what would raise it into `Escalate if`. Rows a floor binds to the
 parent (production, paid runs, gated scripts, the links of a chain) run at the parent's model and level, which does

@@ -1,6 +1,6 @@
 {
   "name": "work-triage",
-  "version": "2.6.1",
+  "version": "2.7.0",
   "description": "Decides which model and thinking level each piece of agent work gets: one session alone for work that fits it, a few batched workers on the cheapest fitting model for large builds, with floors, gates and a spec check.",
   "author": {
     "name": "work-triage contributors"
