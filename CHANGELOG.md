@@ -6,7 +6,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
-- The film uses a new voice-over, read as one continuous take, and runs 33.5 s.
+- The film opens with the bill building itself as a stack and the 130 runs rising as small stacks, and its voice-over
+  says "Opus keeps handing the work to other Opus agents"; one continuous take, 33.5 s.
 
 ### Changed
 
