@@ -24,9 +24,12 @@ ROUND7 = {
     "skill261nc": "skill, prompt names no Codex",
     "autoclean": "no skill, main session at thinking level auto",
     "agentshigh": "no skill text, but the skill's three agents installed for the user",
-    "baseauto": "no skill text, thinking level auto, the skill's three agents installed for the user (unplanned)",
+    "agentsauto": "no skill text, thinking level auto, the skill's three agents installed for the user (unplanned)",
 }
-HEAD = {"basemed": "medium", "skill23": "medium", "autoclean": "auto", "baseauto": "auto"}
+# Arm names as run in the folders; `baseauto` is exported as `agentsauto`, because unlike every other `base*` arm it
+# had the skill's agents installed (review feedback, 2026-11-19).
+ARM_ALIAS = {"baseauto": "agentsauto"}
+HEAD = {"basemed": "medium", "skill23": "medium", "autoclean": "auto", "agentsauto": "auto"}
 FOLDERS = [("runs-v1", 1), ("runs-v2", 2), ("runs-v3", 3), ("runs-v45", 5), ("runs", 6)]
 FIELDS = ["round", "task", "arm", "rep", "skill_version", "head_level", "omp_version", "total_usd", "claude_usd",
           "codex_usd", "parent_usd", "claude_tokens", "codex_tokens", "wall_s", "spawns", "codex_runs", "hidden_passed",
@@ -57,6 +60,7 @@ def rows(study):
             if not os.path.isfile(os.path.join(run, "result.json")):
                 continue
             r = collect.collect(run)
+            r["arm"] = ARM_ALIAS.get(r["arm"], r["arm"])
             note = ""
             if folder == "runs-v2" and (r["arm"], r["task"]) in {("base", "A"), ("base", "B"), ("base", "D")}:
                 continue  # copies of round 1's base runs, reused as round 2's baseline
