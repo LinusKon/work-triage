@@ -1,13 +1,17 @@
 # work-triage
 
-A skill for omp (oh-my-pi) and Claude Code that decides which model and thinking level each piece of agent work gets.
+An agent skill that decides which model and thinking level each piece of agent work gets. Built and measured in omp
+(oh-my-pi); the rules also work in Claude Code. What lasts longest here is probably the method: how to measure
+whether routing saves money, with the harness, hidden tests and data to do it again. The rules are the ones that
+did it as of November 2026.
 
 <a href="study/film/work-triage-1920x1080.mp4"><img src="study/film/work-triage-preview.gif" alt="A stack of work blocks that starts red, every block on Opus, and turns cream block by block as the work moves to Sonnet."></a>
 
 33-second film with sound: [16:9](study/film/work-triage-1920x1080.mp4) · [4:5](study/film/work-triage-1080x1350.mp4)
 
-- **What it saves:** about a third of the cost of a large agent build, with the same hidden acceptance tests
-  passing. The saving depends on the harness version, so it is measured per omp version.
+- **What it saves:** on two large Python builds in omp, 28 to 41 % of the cost (a median $1.66 to $3.18 per build),
+  with the same hidden acceptance tests passing. The runs take 14 to 40 % longer. The saving depends on the harness
+  version, so it is measured per omp version; it has not been measured in Claude Code.
 - **How:** Opus plans, integrates and reviews; Sonnet builds; Codex gets the jobs it is good at, with the model
   always named. Risky work (security, secrets, open interfaces) stays on Opus `high` and is never handed down; a
   module that keeps failing moves up.
@@ -42,23 +46,21 @@ cp ~/src/work-triage/skills/work-triage/agents/*.md ~/.omp/agent/agents/
 ```
 
 Then start work as usual, for example: *"Load the work-triage skill, then plan and build this: …"*.
-In Claude Code the skill's rules apply, but the three agent files are omp definitions: the same roles are spawned
-with model and effort named in each call (see
+In Claude Code the skill's rules apply, but the saving has not been measured there: every study run below ran in
+omp. The three agent files are omp definitions; in Claude Code the same roles are spawned with model and effort
+named in each call (see
 [`references/harness-claude-code.md`](skills/work-triage/references/harness-claude-code.md)).
 
 ## Who gets what
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="study/charts/routing-dark.svg">
-  <img src="study/charts/routing-light.svg" alt="Routing: the main session on Opus high plans and integrates; spec'd modules go to wt-worker on Sonnet medium; dense edge cases and design built in code to wt-worker-hard on Sonnet high; copy and prompts to Opus medium; security, secrets and open interfaces stay on Opus high; one review by wt-reviewer on Opus high; Codex optional with the model always named; escalation from wt-worker to wt-worker-hard, Opus high, xhigh, then Fable.">
-</picture>
+<img src="study/charts/routing.png" width="880" alt="Routing: the main session on Opus high plans and integrates; spec'd modules go to wt-worker on Sonnet medium; dense edge cases and design built in code to wt-worker-hard on Sonnet high; copy and prompts to Opus medium; security, secrets and open interfaces stay on Opus high; one review by wt-reviewer on Opus high; Codex optional with the model always named; escalation from wt-worker to wt-worker-hard, Opus high, xhigh, then Fable.">
 
 | Work | Who gets it |
 |---|---|
 | The shared contract and the integration | the main session, which keeps its model and level (Opus 5.5 `high` in the study) |
 | Spec'd modules, tests and docs | `wt-worker` (Sonnet 5.5 `medium`), four to six modules per worker |
 | The same with dense edge cases or an approach to choose | `wt-worker-hard` (Sonnet 5.5 `high`) |
-| Design built in code: pages, motion, 3D scenes | Sonnet 5.5 `high`; Opus 5.5 `high` for a better result at three to five times the price; never Opus `medium`; Fable 5.2 only when the best possible result is asked for |
+| Design built in code: pages, motion, 3D scenes | Sonnet 5.5 `high`; Opus 5.5 `high` for a better result at three to five times the price; avoid Opus `medium` (the worst value in our test, judged by two models); Fable 5.2 only when the best possible result is asked for |
 | Copy, image and video prompts | Opus 5.5 `medium`, named per call |
 | Floors: security, secrets, an interface still to decide | Opus 5.5 `high`, never cheaper |
 | One review of the merged result | `wt-reviewer` (Opus 5.5 `high`) |
@@ -68,7 +70,8 @@ A module that fails twice moves one step up: `wt-worker` → `wt-worker-hard` �
 Pushes, deploys, paid calls, key changes and anything irreversible happen only on the user's word.
 
 The two large builds measured the two Sonnet rows, the main session and the reviewer; the design row rests on 90
-runs on six creative briefs. The copy row, the floors and the Codex rows are rules, not measurements.
+runs on six creative briefs. The copy row, the floors and the Codex rows are rules, not measurements. Model names,
+levels and prices are those of November 2026 and will need updating as models and harnesses change.
 
 ## The evidence
 
@@ -84,10 +87,7 @@ one-sided rank-sum test; the pass bars for the first two rows were written down 
 subagents at lower thinking levels by itself, so its baseline is cheaper; a saving measured in one version does not
 carry to the next.
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="study/charts/share-card-dark.svg">
-  <img src="study/charts/share-card-light.svg" alt="Large agent builds, about a third cheaper: minus 32 % on build H ($6.06 to $4.11) and minus 41 % on build I ($7.76 to $4.58), every run shown as a dot.">
-</picture>
+<img src="study/charts/evidence.png" width="880" alt="Large Python builds in omp, median cost per build without and with the skill, every run shown as a light: build H on omp 18.21.0 $6.06 to $4.11 (minus 32 %); build I on omp 18.21.0 $7.76 to $4.58 (minus 41 %); build I on omp 18.22.0 $5.91 to $4.25 (minus 28 %); build I on omp 18.22.0, Claude only, $6.43 to $4.28 (minus 33 %). That is 28 to 41 % less, $1.66 to $3.18 per build.">
 
 - **Small tasks: no saving.** On work that fits one session the skill saves nothing, so it now only says so.
 - **Quality: the same, not better.** Major defects, graded blind: 14 without the skill and 15 with it on build H,
@@ -97,10 +97,7 @@ carry to the next.
 It did not start out like this: the first version cost twice as much as no skill, and the
 [study's rounds](study/README.md#rounds) list every version, including those the skill lost.
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="study/charts/journey-dark.svg">
-  <img src="study/charts/journey-light.svg" alt="Median total cost of the skill relative to no skill, version by version.">
-</picture>
+<img src="study/charts/journey.png" width="880" alt="Median total cost of the skill relative to no skill, version by version.">
 
 **Design built in code.** A separate test gave five design briefs (a title sequence, a landing page, a 3D scene, a
 logo sting, a pricing page) to four models, three runs each. Sonnet 5.5 `high` gave a usable result in 13 of 15
@@ -108,10 +105,7 @@ runs, Opus 5.5 `high` in 14 at three to five times Sonnet's price, Fable 5.2 `hi
 Opus `high`, and Opus `medium` in only 8, at a higher price than Sonnet. Two models judged the outputs blind (Opus
 5.5 `high` and `gpt-6-astra` `high`), not a person, and they agreed with each other only moderately.
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="study/charts/creative-dark.svg">
-  <img src="study/charts/creative-light.svg" alt="Design built in code: usable outputs and cost per usable output for Sonnet 5.5 high, Opus 5.5 medium, Opus 5.5 high and Fable 5.2 high.">
-</picture>
+<img src="study/charts/creative.png" width="880" alt="Design built in code: usable outputs and cost per usable output for Sonnet 5.5 high, Opus 5.5 medium, Opus 5.5 high and Fable 5.2 high.">
 
 The [study](study/README.md) has the method, the data, every chart's source and its limits: one harness, one
 main-session model, Python builds written by the skill's authors, five runs per arm.
@@ -152,7 +146,7 @@ defect, the creative briefs and judging, and one CSV row per run.
 
 ```bash
 python3 study/collect.py --selftest                 # the permutation test and the parsers
-python3 study/charts.py study/data study/charts      # redraw every chart from the CSV files
+python3 study/charts_lightbox.py study/data study/charts --fonts <fonts dir>   # redraw every chart from the CSV files
 python3 tests/work-triage/score.py --selftest        # the plan-table scorer
 ```
 

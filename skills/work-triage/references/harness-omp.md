@@ -22,7 +22,7 @@ The skill ships three agent definitions in its `agents/` folder:
   does not apply to them.
 - Rows no agent fits name a per-call `model` with a level: Opus 5.5 `high` for floors, Opus 5.5 `medium` for copy
   and for image and video prompts. Design built in code goes to `wt-worker-hard` (Sonnet 5.5 `high`) or, for a
-  better result at a higher price, Opus 5.5 `high`; never Opus `medium` (SKILL.md section 2, item 3). Never `effort`.
+  better result at a higher price, Opus 5.5 `high`; avoid Opus `medium` (SKILL.md section 2, item 3). Never `effort`.
 
 ## Terms
 

@@ -2,7 +2,7 @@
 name: work-triage
 description: "Decides who does each piece of agent work and at what thinking level: Claude Sonnet 5.5, Opus 5.5 or Fable 5.2, or Codex (gpt-6.1-sol, gpt-6-astra, gpt-6.1-terra, gpt-6-luna). Work that fits one session is done by that session alone; a large build is split into a few batches, each given to the cheapest model and level that fits, while the main session keeps its own. Holds floors for critical work and gates only the user passes. Load before presenting any plan of three or more steps or any plan with a step that spends money, touches secrets or leaves the machine; before spawning subagents; whenever work goes to Codex; and when the user asks which model or level a task needs."
 metadata:
-  version: 2.7.0
+  version: 2.7.1
 ---
 
 # Work triage
@@ -44,10 +44,10 @@ parent's model and level. So:
    - `wt-reviewer` (Opus 5.5 `high`): the review at the join and the security review; it does not edit.
    - Anything else names its `model` with level, never `effort`:
      - **Design built in code** (pages, motion, 3D scenes): Sonnet 5.5 `high` (`wt-worker-hard` fits). Opus 5.5
-       `high` when a clearly better result is worth three to five times the price. Never Opus `medium`: on six
-       briefs two blind model judges ranked it last and found it usable less often than Sonnet `high`, at a higher
-       price. Fable 5.2 `high` only when the user asks for the best possible result: it was ranked first most
-       often and costs four to twelve times Opus `high` (`references/calibration.md`, item 9).
+       `high` when a clearly better result is worth three to five times the price. Avoid Opus `medium` here: on six
+       briefs two blind model judges (who agreed only moderately) ranked it last and found it usable less often than
+       Sonnet `high`, at a higher price. Fable 5.2 `high` only when the user asks for the best possible result: it
+       was ranked first most often and costs four to twelve times Opus `high` (`references/calibration.md`, item 9).
      - Other taste work (copy, prompts for image and video models): Opus 5.5 `medium`. Not measured.
      - Floors (section 3): Opus 5.5 `high`.
      A spawn with neither a fitting agent nor a `model` inherits the parent's model and level. Other harnesses,

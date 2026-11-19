@@ -6,17 +6,27 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
-- The film opens with the bill building itself as a stack and the 130 runs rising as small stacks, and its voice-over
-  says "Opus keeps handing the work to other Opus agents"; one continuous take, 33.5 s.
+## [2.7.1] - 2026-11-19
 
 ### Changed
 
+- After an outside review: the README states the saving's scope (two large Python builds in omp, 28 to 41 %, a
+  median $1.66 to $3.18 per build, 14 to 40 % longer runs), that it is not measured in Claude Code, that model names
+  and prices are those of November 2026, and that the method is the lasting part. "Never Opus `medium`" for design
+  became "avoid", with the judges' moderate agreement named. The round-7 arm with the agents installed is exported
+  as `agentsauto` (was `baseauto`).
+- Every chart redrawn as a PNG in the film's look (`study/charts_lightbox.py`); the share card gave way to an
+  evidence chart with absolute dollars per omp version.
+- The film opens with the bill building itself as a stack and the 130 runs rising as small stacks, and its voice-over
+  says "Opus keeps handing the work to other Opus agents"; one continuous take, 33.5 s.
 - README rebuilt: a 15-second summary at the top, one evidence table with every measurement, a "Who gets what"
   picture with Codex and the escalation ladder in place of the flowchart, a chart for the creative part.
+- README states the saving's scope (two large Python builds in omp, 28 to 41 %, $1.66 to $3.18 per build), that
+  the saving is not measured in Claude Code, and that model names and prices are those of November 2026.
 
 ### Added
 
-- A 36-second film (`study/film/`, 16:9 and 4:5, with voice-over) and a silent preview loop at the top of the README.
+- A 33-second film (`study/film/`, 16:9 and 4:5, with voice-over) and a silent preview loop at the top of the README.
 
 ## [2.7.0] - 2026-11-17
 

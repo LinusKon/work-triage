@@ -74,10 +74,7 @@ What each round changed in the skill:
 - **After round 5:** "exactly the spec, not stricter". The blind grading showed that half of the major defects in
   both arms were restrictions nobody had asked for.
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="charts/small-tasks-dark.svg">
-  <img src="charts/small-tasks-light.svg" alt="Small tasks: median cost per run without the skill, with it, and without it with the main session at medium.">
-</picture>
+<img src="charts/small-tasks.png" width="880" alt="Small tasks: median cost per run without the skill, with it, and without it with the main session at medium.">
 
 ## The two large builds
 
@@ -86,10 +83,7 @@ operations, each with tests and a doc page. **Build I, `tasktrack`** ([spec](tas
 with atomic writes, a query language with a parser, date recurrence, three file formats, a report and a command
 line. I was written after skill 2.6 was frozen and was never used to tune it.
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="charts/cost-large-builds-dark.svg">
-  <img src="charts/cost-large-builds-light.svg" alt="Total cost per run on the two large builds.">
-</picture>
+<img src="charts/cost-large-builds.png" width="880" alt="Total cost of every run on the two large builds, one stack per run, without and with the skill.">
 
 | | H, no skill | H, skill 2.5 | I, no skill | I, skill 2.6 |
 |---|---|---|---|---|
@@ -110,17 +104,11 @@ levels, and in nine of ten runs one to three reviews on the most expensive Codex
 runs used the shipped agents (four or five Sonnet workers and one Opus reviewer); two runs of build H sent the
 modules to the cheap Codex model in batches instead, at the same cost.
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="charts/cost-split-dark.svg">
-  <img src="charts/cost-split-light.svg" alt="Mean cost per run by who did the work.">
-</picture>
+<img src="charts/cost-split.png" width="880" alt="Mean cost per run by who did the work.">
 
 ## Quality
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="charts/defects-dark.svg">
-  <img src="charts/defects-light.svg" alt="Major defects per build after blind, uniform grading.">
-</picture>
+<img src="charts/defects.png" width="880" alt="Major defects per build after blind, uniform grading.">
 
 | Defects present, summed over 5 runs (Python 3.12) | H, no skill | H, skill 2.5 | I, no skill | I, skill 2.6 |
 |---|---|---|---|---|
@@ -239,14 +227,14 @@ floor on security and interface steps (Opus 9 times, astra 17). Floors are there
 |---|---|
 | [`data/runs.csv`](data/runs.csv) | One row per run: round, task, arm, skill version, main-session level, omp version, total, Claude and Codex dollars, main-session dollars, tokens, wall time, spawns, hidden-test result, Sonnet and Opus dollars, note |
 | [`data/creative.csv`](data/creative.csv) | One row per creative output: brief, setup, cost, minutes, objective checks, both judges' rank and "would you hand it to a client" |
-| [`creative/`](creative) | The six briefs, the renderer and checks, the blind ranking page, the judge prompts and the analysis of the creative part; `run_creative.sh` runs one output |
+| [`creative/`](creative) | The six briefs, the renderer and checks, the blind ranking page, the judge prompts and the analysis of the creative part; [`run_creative.sh`](run_creative.sh), next to this file, runs one output |
 | [`data/defects.csv`](data/defects.csv), [`data/defect-kinds.csv`](data/defect-kinds.csv) | Defects per run and per kind for the two large builds |
-| [`charts/`](charts) | Every chart, drawn by `charts.py` from the CSV files, in a light and a dark variant |
+| [`charts/`](charts) | Every chart as a PNG in the film's look, drawn by `charts_lightbox.py` from the CSV files (older light and dark SVGs by `charts.py`) |
 | [`tasks/`](tasks) | The nine specifications; `F.seed/` is the seeded repository of task F |
 | [`hidden-tests/`](hidden-tests) | The acceptance tests no session saw |
 | [`adjudication/`](adjudication) | Per large build: the graded defect list, the probes and their verdicts under two interpreters |
 | `run_study.sh`, `collect.py`, `blind_review.sh` | The runner, the cost collector with the permutation test, the blind review |
-| `export_data.py`, `export_defects.py`, `charts.py` | From local run folders to the CSV files and charts |
+| `export_data.py`, `export_defects.py`, `charts_lightbox.py`, `charts.py` | From local run folders to the CSV files and charts |
 
 The scripts are published as they ran, with one change: the line that keeps API keys out of child sessions now
 strips every variable ending in `_KEY`, `_TOKEN` or `_SECRET` instead of naming one. `run_study.sh` expects the
