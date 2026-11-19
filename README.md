@@ -5,9 +5,9 @@ An agent skill that decides which model and thinking level each piece of agent w
 whether routing saves money, with the harness, hidden tests and data to do it again. The rules are the ones that
 did it as of November 2026.
 
-<a href="study/film/work-triage-1920x1080.mp4"><img src="study/film/work-triage-preview.gif" alt="A stack of work blocks that starts red, every block on Opus, and turns cream block by block as the work moves to Sonnet."></a>
+<img src="study/charts/evidence.png" width="880" alt="Large Python builds in omp, median cost per build without and with the skill, every run shown as a light: build H on omp 18.21.0 $6.06 to $4.11 (minus 32 %); build I on omp 18.21.0 $7.76 to $4.58 (minus 41 %); build I on omp 18.22.0 $5.91 to $4.25 (minus 28 %); build I on omp 18.22.0, Claude only, $6.43 to $4.28 (minus 33 %). That is 28 to 41 % less, $1.66 to $3.18 per build.">
 
-33-second film with sound: [16:9](study/film/work-triage-1920x1080.mp4) · [4:5](study/film/work-triage-1080x1350.mp4)
+A short film about the study, with sound: [16:9](study/film/work-triage-1920x1080.mp4) · [4:5](study/film/work-triage-1080x1350.mp4)
 
 - **What it saves:** on two large Python builds in omp, 28 to 41 % of the cost (a median $1.66 to $3.18 per build),
   with the same hidden acceptance tests passing. The runs take 14 to 40 % longer. The saving depends on the harness
@@ -86,8 +86,6 @@ Every run passed a hidden acceptance test that ran after the session ended and n
 one-sided rank-sum test; the pass bars for the first two rows were written down before the runs. omp 18.22.0 runs
 subagents at lower thinking levels by itself, so its baseline is cheaper; a saving measured in one version does not
 carry to the next.
-
-<img src="study/charts/evidence.png" width="880" alt="Large Python builds in omp, median cost per build without and with the skill, every run shown as a light: build H on omp 18.21.0 $6.06 to $4.11 (minus 32 %); build I on omp 18.21.0 $7.76 to $4.58 (minus 41 %); build I on omp 18.22.0 $5.91 to $4.25 (minus 28 %); build I on omp 18.22.0, Claude only, $6.43 to $4.28 (minus 33 %). That is 28 to 41 % less, $1.66 to $3.18 per build.">
 
 - **Small tasks: no saving.** On work that fits one session the skill saves nothing, so it now only says so.
 - **Quality: the same, not better.** Major defects, graded blind: 14 without the skill and 15 with it on build H,
